@@ -1,4 +1,3 @@
-
 const express = require('express');
 const http    = require('http');
 const WS      = require('ws');
@@ -12,12 +11,13 @@ const wss    = new WS.Server({ server });
 app.use(express.json());
 app.use(express.static(path.join(__dirname, 'public')));
 
-/* ─── IN-MEMORY STORE ─── */
+const DEFAULT_BG = 'https://freesorgupanel.neocities.org/grok_image_1773002252364.jpg';
+
 const store = {
   users: {},
   chat:  [],
-  video: { type:'none', vid:'', vurl:'', title:'Yayın bekleniyor...', playing:false, at:Date.now() },
-  room:  { name:'Film Odası', bg_url:'', entrance_effect:'royal', entrance_video:'' }
+  video: { type:'none', vid:'', vurl:'', title:'Yayin bekleniyor...', playing:false, at:Date.now() },
+  room:  { name:'Film Odasi', bg_url: DEFAULT_BG, entrance_effect:'royal', entrance_video:'' }
 };
 
 function bcast(data, skip=null){
@@ -43,7 +43,6 @@ wss.on('connection',ws=>{
   ws.on('message',raw=>{
     let d; try{d=JSON.parse(raw);}catch{return;}
     switch(d.type){
-
       case 'join':{
         const {username,tur,avatar=''}=d;
         if(!username)return;
@@ -56,12 +55,11 @@ wss.on('connection',ws=>{
         };
         ws.send(JSON.stringify({type:'init',myId:ws.wsId,video:store.video,chat:store.chat.slice(-60),users:allUsers(),room:store.room}));
         bcast({type:'entrance',username,tur:tur||'user',effect:tur==='admin'?store.room.entrance_effect:'normal',entrance_video:tur==='admin'?store.room.entrance_video:''},ws.wsId);
-        const m=sysMsg(`${username} odaya katıldı`);
+        const m=sysMsg(`${username} odaya katildi`);
         bcast({type:'chat',msg:m});
         bcast({type:'users',users:allUsers()});
         break;
       }
-
       case 'chat':{
         const u=store.users[ws.wsId];
         if(!u||u.muted||u.banned||!d.text?.trim())return;
@@ -69,7 +67,6 @@ wss.on('connection',ws=>{
         bcast({type:'chat',msg:chatMsg(u,d.text)});
         break;
       }
-
       case 'video_change':{
         const u=store.users[ws.wsId];
         if(!u||u.tur!=='admin')return;
@@ -78,7 +75,6 @@ wss.on('connection',ws=>{
         bcast({type:'chat',msg:sysMsg(`${u.username} yeni video: ${store.video.title}`)});
         break;
       }
-
       case 'video_sync':{
         const u=store.users[ws.wsId];
         if(!u||u.tur!=='admin')return;
@@ -86,7 +82,6 @@ wss.on('connection',ws=>{
         bcast({type:'video_sync',video:store.video},ws.wsId);
         break;
       }
-
       case 'take_seat':{
         const u=store.users[ws.wsId];
         if(!u)return;
@@ -99,7 +94,6 @@ wss.on('connection',ws=>{
         bcast({type:'users',users:allUsers()});
         break;
       }
-
       case 'voice_join':{
         const u=store.users[ws.wsId];
         if(!u||u.seat===0)return;
@@ -110,7 +104,6 @@ wss.on('connection',ws=>{
         bcast({type:'users',users:allUsers()});
         break;
       }
-
       case 'voice_leave':{
         const u=store.users[ws.wsId];
         if(!u)return;
@@ -119,14 +112,12 @@ wss.on('connection',ws=>{
         bcast({type:'users',users:allUsers()});
         break;
       }
-
       case 'webrtc_signal':{
         const u=store.users[ws.wsId];
         if(!u||!d.to)return;
         sendTo(d.to,{type:'webrtc_signal',from:ws.wsId,signal:d.signal});
         break;
       }
-
       case 'update_avatar':{
         const u=store.users[ws.wsId];
         if(!u)return;
@@ -134,7 +125,6 @@ wss.on('connection',ws=>{
         bcast({type:'users',users:allUsers()});
         break;
       }
-
       case 'room_settings':{
         const u=store.users[ws.wsId];
         if(!u||u.tur!=='admin')return;
@@ -142,7 +132,6 @@ wss.on('connection',ws=>{
         bcast({type:'room_settings',room:store.room});
         break;
       }
-
       case 'mute_user':{
         const u=store.users[ws.wsId];
         if(!u||u.tur!=='admin')return;
@@ -150,10 +139,9 @@ wss.on('connection',ws=>{
         if(!t)return;
         t.muted=!t.muted;
         bcast({type:'users',users:allUsers()});
-        bcast({type:'chat',msg:sysMsg(`${t.username} ${t.muted?'susturuldu':'sesi açıldı'}`)});
+        bcast({type:'chat',msg:sysMsg(`${t.username} ${t.muted?'susturuldu':'sesi acildi'}`)});
         break;
       }
-
       case 'kick_user':{
         const u=store.users[ws.wsId];
         if(!u||u.tur!=='admin')return;
@@ -161,10 +149,9 @@ wss.on('connection',ws=>{
         if(!t)return;
         t.banned=true;
         sendTo(t.id,{type:'banned'});
-        bcast({type:'chat',msg:sysMsg(`${t.username} odadan atıldı`)});
+        bcast({type:'chat',msg:sysMsg(`${t.username} odadan atildi`)});
         break;
       }
-
       case 'gift':{
         const u=store.users[ws.wsId];
         if(!u)return;
@@ -173,19 +160,15 @@ wss.on('connection',ws=>{
         bcast({type:'gift_fx',from:u.username,to:d.to,name:d.name,emoji:d.emoji||'★'});
         break;
       }
-
-      case 'ping':
-        ws.send(JSON.stringify({type:'pong'}));
-        break;
+      case 'ping': ws.send(JSON.stringify({type:'pong'})); break;
     }
   });
-
   ws.on('close',()=>{
     const u=store.users[ws.wsId];
     if(!u)return;
     if(u.voice)bcast({type:'voice_peer_left',peerId:ws.wsId});
     delete store.users[ws.wsId];
-    bcast({type:'chat',msg:sysMsg(`${u.username} ayrıldı`)});
+    bcast({type:'chat',msg:sysMsg(`${u.username} ayrildi`)});
     bcast({type:'users',users:allUsers()});
   });
   ws.on('error',()=>{});
@@ -199,4 +182,4 @@ setInterval(()=>{
 },25000);
 
 const PORT=process.env.PORT||3000;
-server.listen(PORT,()=>console.log(`\n  Film Odasi  http://localhost:${PORT}\n  Admin URL:  http://localhost:${PORT}?isAdmin=true\n`));
+server.listen(PORT,()=>console.log(`\n  Film Odasi  http://localhost:${PORT}\n  Admin:      http://localhost:${PORT}?isAdmin=true\n`));
