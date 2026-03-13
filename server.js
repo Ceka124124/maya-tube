@@ -3,7 +3,6 @@ const http      = require('http');
 const WS        = require('ws');
 const { v4: uuid } = require('uuid');
 const path      = require('path');
-const admin     = require('firebase-admin');
 
 /* ══ FIREBASE INIT ══ */
 const firebaseConfig = {
