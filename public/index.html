@@ -1,0 +1,1502 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width,initial-scale=1.0,maximum-scale=1.0,user-scalable=no,viewport-fit=cover"/>
+<meta name="apple-mobile-web-app-capable" content="yes"/>
+<title>Maya Film</title>
+<link rel="preconnect" href="https://fonts.googleapis.com"/>
+<link href="https://fonts.googleapis.com/css2?family=Cinzel+Decorative:wght@700;900&family=Rajdhani:wght@400;600;700&family=Exo+2:wght@300;400;600;700&display=swap" rel="stylesheet"/>
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css"/>
+<style>
+:root{
+  --acc:#c41230;--acc2:#e63950;--rose:#e11d48;
+  --gold:#f59e0b;--cyan:#0891b2;--grn:#059669;--vio:#7c3aed;
+  --txt:#fff;--mut:rgba(255,255,255,.5);
+  --r:cubic-bezier(.16,1,.3,1);
+  --st:env(safe-area-inset-top,0px);--sb:env(safe-area-inset-bottom,0px);
+  --brd:rgba(255,255,255,.18);--brd2:rgba(255,255,255,.10);
+}
+*,*::before,*::after{margin:0;padding:0;box-sizing:border-box;-webkit-tap-highlight-color:transparent}
+html,body{height:100%;overflow:hidden;overscroll-behavior:none}
+body{font-family:'Rajdhani',sans-serif;color:#fff;touch-action:manipulation;background:transparent}
+::-webkit-scrollbar{width:3px;height:3px}
+::-webkit-scrollbar-thumb{background:var(--acc2);border-radius:2px}
+input,textarea,select{outline:none;-webkit-appearance:none;font-family:inherit;color:#fff;background:none}
+button{border:none;cursor:pointer;-webkit-appearance:none;font-family:inherit;color:inherit;background:none}
+
+/* ── BG ── */
+#bgFixed{position:fixed;inset:0;z-index:0;background:url('https://freesorgupanel.neocities.org/bg_move_new.png') center/cover no-repeat fixed;pointer-events:none}
+#bgLayer,#bgVideo,#bgImg{display:none!important}
+
+/* ── LOADER ── */
+#loader{position:fixed;inset:0;z-index:900;background:rgba(10,0,5,.95);display:flex;flex-direction:column;align-items:center;justify-content:center;gap:18px;transition:opacity .5s,transform .5s}
+#loader.gone{opacity:0;transform:scale(1.04);pointer-events:none}
+.ld-logo{font-family:'Cinzel Decorative';font-size:clamp(20px,6vw,34px);background:linear-gradient(135deg,#fff,#e63950,#fff);-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;animation:shimmer 2s infinite;background-size:200%}
+.ld-sub2{font-family:'Exo 2';font-size:10px;color:rgba(255,255,255,.35);letter-spacing:.3em;margin-top:-10px}
+@keyframes shimmer{0%,100%{background-position:0 50%}50%{background-position:100% 50%}}
+.ld-strip{display:flex;gap:5px}
+.ld-f{width:8px;height:14px;border:2px solid #e63950;border-radius:3px;animation:ff .45s infinite alternate}
+.ld-f:nth-child(2n){animation-delay:.1s}.ld-f:nth-child(3n){animation-delay:.2s}
+@keyframes ff{from{opacity:.2;transform:scaleY(.6)}to{opacity:1;transform:scaleY(1)}}
+.ld-bar{width:200px;height:2px;background:rgba(255,255,255,.1);border-radius:2px;overflow:hidden}
+.ld-fill{height:100%;width:0;background:linear-gradient(90deg,#c41230,#e63950);transition:width .1s}
+
+/* ── JOIN ── */
+#joinScreen{position:fixed;inset:0;z-index:500;display:flex;align-items:center;justify-content:center;padding:18px;transition:opacity .35s,transform .35s}
+#joinScreen.gone{opacity:0;transform:scale(1.05);pointer-events:none}
+.jp{position:absolute;pointer-events:none;animation:jfloat linear infinite}
+@keyframes jfloat{0%{transform:translateY(105vh) rotate(0);opacity:0}8%{opacity:.3}90%{opacity:.15}100%{transform:translateY(-10vh) rotate(360deg);opacity:0}}
+.jcard{background:rgba(255,255,255,.1);border:1px solid rgba(255,255,255,.2);border-radius:22px;padding:28px 22px;width:min(420px,100%);box-shadow:0 8px 48px rgba(196,18,48,.25),0 0 0 1px rgba(255,255,255,.08) inset;backdrop-filter:blur(30px);display:flex;flex-direction:column;gap:14px}
+.jlogo{font-family:'Cinzel Decorative';font-size:clamp(16px,5vw,26px);background:linear-gradient(135deg,#fff,#e63950,#fff);-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;text-align:center;animation:shimmer 3s infinite;background-size:200%;line-height:1.4}
+.jsub{font-family:'Exo 2';font-size:9px;color:rgba(255,255,255,.45);letter-spacing:.22em;text-align:center;margin-top:-8px}
+.jf{display:flex;flex-direction:column;gap:5px}
+.jf label{font-family:'Exo 2';font-size:9px;color:rgba(255,255,255,.55);font-weight:700;letter-spacing:.1em;display:flex;align-items:center;gap:5px}
+.jf label i{font-size:10px;color:var(--acc2)}
+.jin{background:rgba(255,255,255,.1);border:1.5px solid rgba(255,255,255,.2);border-radius:10px;padding:11px 13px;font-family:'Exo 2';font-size:14px;width:100%;color:#fff;transition:border-color .2s}
+.jin:focus{border-color:var(--acc2);box-shadow:0 0 0 3px rgba(230,57,80,.15)}
+.jin::placeholder{color:rgba(255,255,255,.3)}
+.av-row{display:flex;align-items:center;gap:10px}
+.av-row .jin{flex:1}
+.av-thumb{width:42px;height:42px;border-radius:50%;border:2px solid rgba(255,255,255,.2);overflow:hidden;flex-shrink:0;background:rgba(255,255,255,.08);display:flex;align-items:center;justify-content:center;font-size:12px;font-weight:700;color:#fff;font-family:'Exo 2'}
+.av-thumb img{width:100%;height:100%;object-fit:cover;display:none}
+.admin-note{font-family:'Exo 2';font-size:10px;color:#fef08a;background:rgba(196,18,48,.15);border:1px solid rgba(196,18,48,.3);border-radius:8px;padding:7px 10px;display:none;align-items:center;gap:6px}
+.admin-note.show{display:flex}
+.jbtn{background:linear-gradient(135deg,#c41230,#e63950);border-radius:12px;padding:13px;color:#fff;font-family:'Cinzel Decorative';font-size:13px;transition:transform .15s,box-shadow .15s;box-shadow:0 4px 18px rgba(196,18,48,.4)}
+.jbtn:active{transform:scale(.97)}
+.saved-hint{font-family:'Exo 2';font-size:10px;color:rgba(255,255,255,.4);text-align:center;cursor:pointer;text-decoration:underline}
+
+/* ── APP ── */
+#app{position:fixed;inset:0;z-index:10;display:none;flex-direction:column;height:100dvh}
+
+/* ── HEADER ── */
+#hdr{flex-shrink:0;height:calc(36px + var(--st));padding-top:var(--st);background:rgba(255,255,255,.07);border-bottom:1px solid rgba(255,255,255,.1);display:flex;align-items:center;gap:6px;padding-inline:8px;position:relative;z-index:50}
+.hlogo{font-family:'Cinzel Decorative';font-size:11px;background:linear-gradient(135deg,#fff,var(--acc2));-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;white-space:nowrap;flex-shrink:0}
+.hname{font-family:'Exo 2';font-size:8px;color:rgba(255,255,255,.55);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;max-width:80px}
+.hsp{flex:1}
+.hlive{display:flex;align-items:center;gap:3px;background:rgba(225,29,72,.15);border:1px solid rgba(225,29,72,.35);border-radius:8px;padding:2px 6px;font-size:7px;color:#ff6b7a;font-weight:700;letter-spacing:.08em;flex-shrink:0}
+.hdot{width:4px;height:4px;border-radius:50%;background:#ff6b7a;animation:dp 1.2s infinite}
+@keyframes dp{0%,100%{opacity:1}50%{opacity:.2}}
+.hcnt{font-size:8px;color:rgba(255,255,255,.5);display:flex;align-items:center;gap:3px;flex-shrink:0}
+.hbtn{background:rgba(255,255,255,.08);border:1px solid rgba(255,255,255,.15);border-radius:6px;padding:3px 7px;font-size:11px;color:rgba(255,255,255,.8);transition:all .15s;flex-shrink:0}
+.hbtn:active{transform:scale(.91);background:rgba(255,255,255,.18)}
+.hbtn.red{background:rgba(225,29,72,.1);border-color:rgba(225,29,72,.28);color:#ff6b7a}
+.hbtn.gold{background:rgba(245,158,11,.1);border-color:rgba(245,158,11,.28);color:#fcd34d}
+#myAvBtn{width:26px;height:26px;border-radius:50%;border:2px solid rgba(255,255,255,.2);overflow:visible;flex-shrink:0;background:rgba(255,255,255,.08);display:flex;align-items:center;justify-content:center;font-size:9px;font-weight:700;color:#fff;font-family:'Exo 2';cursor:pointer;position:relative}
+#myAvBtn img{width:100%;height:100%;object-fit:cover;display:none;border-radius:50%}
+#myAvBtn .frame-overlay{position:absolute;inset:-6px;pointer-events:none;background-size:contain;background-repeat:no-repeat;background-position:center;z-index:2}
+
+/* ── MAIN ── */
+#main{flex:1;display:flex;flex-direction:column;overflow:hidden;min-height:0}
+@media(min-width:768px){
+  #main{flex-direction:row}
+  #videoPane{width:clamp(280px,50%,600px);flex-shrink:0;border-right:1px solid var(--brd)}
+  #playerWrap{height:auto!important;aspect-ratio:16/9}
+  #chatPane{flex:1;min-width:0}
+}
+
+/* ── VIDEO PANE ── */
+#videoPane{flex-shrink:0;display:flex;flex-direction:column;background:transparent}
+#playerWrap{height:clamp(150px,32vh,290px);position:relative;background:#000;overflow:hidden;flex-shrink:0}
+#playerWrap::before{content:'';position:absolute;inset:0;z-index:5;background:url('https://freesorgupanel.neocities.org/cinema_screen.png') center/100% 100% no-repeat;pointer-events:none}
+#playerWrap iframe,#playerWrap video{position:absolute;inset:0;width:100%;height:100%;border:0;z-index:1}
+#placeholder{position:absolute;inset:0;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:10px;background:linear-gradient(135deg,#1a0005,#0d0002);z-index:1}
+.ph-ic{font-size:40px;color:rgba(230,57,80,.4);animation:flt 4s ease-in-out infinite}
+@keyframes flt{0%,100%{transform:translateY(0)}50%{transform:translateY(-8px)}}
+.ph-t{font-family:'Cinzel Decorative';font-size:10px;color:rgba(255,200,200,.28);text-align:center;padding:0 20px}
+#vidBar{flex-shrink:0;display:flex;align-items:center;gap:6px;padding:5px 9px;background:rgba(255,255,255,.05);border-bottom:1px solid var(--brd2);min-height:30px}
+#vidTitle{font-family:'Exo 2';font-size:10px;color:rgba(255,255,255,.7);flex:1;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.vbadge{font-size:8px;font-weight:700;padding:2px 6px;border-radius:6px;font-family:'Exo 2';flex-shrink:0}
+.vbyt{background:rgba(255,0,0,.15);border:1px solid rgba(255,0,0,.3);color:#fc6b6b}
+.vbmp4{background:rgba(8,145,178,.1);border:1px solid rgba(8,145,178,.25);color:#67e8f9}
+.vbok{background:rgba(230,57,80,.1);border:1px solid rgba(230,57,80,.25);color:#fca5a5}
+.vbrt{background:rgba(124,58,237,.1);border:1px solid rgba(124,58,237,.25);color:#c4b5fd}
+.vbvio{background:rgba(124,58,237,.1);border:1px solid rgba(124,58,237,.25);color:#c4b5fd}
+.vbgrn{background:rgba(5,150,105,.1);border:1px solid rgba(5,150,105,.25);color:#6ee7b7}
+.vsm{font-size:11px;color:rgba(255,255,255,.45);padding:3px 5px;border-radius:5px;background:rgba(255,255,255,.07);flex-shrink:0;transition:all .14s}
+#adminCtrl{display:none;flex-shrink:0;padding:5px 8px;gap:4px;background:rgba(255,255,255,.05);border-bottom:1px solid var(--brd2);flex-wrap:wrap}
+#adminCtrl.show{display:flex;align-items:center}
+#vName{width:80px;flex-shrink:0;font-family:'Exo 2';font-size:11px;background:rgba(255,255,255,.08);border:1px solid var(--brd);border-radius:7px;padding:6px 8px;color:#fff}
+#vUrl{flex:1;min-width:0;font-family:'Exo 2';font-size:11px;background:rgba(255,255,255,.08);border:1px solid var(--brd);border-radius:7px;padding:6px 8px;color:#fff}
+#vName:focus,#vUrl:focus{border-color:var(--acc2)}
+#vName::placeholder,#vUrl::placeholder{color:rgba(255,255,255,.28)}
+.vcbtn{flex-shrink:0;background:rgba(255,255,255,.08);border:1px solid var(--brd);border-radius:7px;padding:6px 9px;font-size:12px;color:rgba(255,255,255,.75);transition:all .14s}
+
+/* ── SEATS ── */
+#seatsArea{flex-shrink:0;background:transparent;border-bottom:1px solid rgba(255,255,255,.07);padding:10px 10px 8px}
+.slbl{font-family:'Exo 2';font-size:8px;color:rgba(255,255,255,.45);letter-spacing:.14em;font-weight:700;margin-bottom:10px;display:flex;align-items:center;gap:5px}
+.slbl i{color:var(--acc2);font-size:10px}
+#seatRow{display:flex;gap:12px;overflow-x:auto;padding:4px 2px 8px;scrollbar-width:none;justify-content:flex-start}
+#seatRow::-webkit-scrollbar{display:none}
+.seat{flex-shrink:0;width:68px;cursor:pointer;position:relative;display:flex;flex-direction:column;align-items:center;margin-top:20px;user-select:none;transition:transform .15s}
+.seat:active{transform:scale(.92)}
+.seat:hover{transform:scale(1.06)}
+.seat-av{position:absolute;top:2px;left:50%;transform:translateX(-50%);width:32px;height:32px;border-radius:50%;overflow:visible;background:rgba(255,255,255,.12);border:2px solid rgba(255,255,255,.4);display:none;align-items:center;justify-content:center;font-size:10px;font-weight:700;color:#fff;font-family:'Exo 2';z-index:3;box-shadow:0 2px 8px rgba(0,0,0,.5)}
+.seat-av img{width:100%;height:100%;object-fit:cover;display:none;border-radius:50%}
+.seat-av-inner{width:100%;height:100%;border-radius:50%;overflow:hidden;display:flex;align-items:center;justify-content:center;font-size:10px;font-weight:700;color:#fff}
+.seat-frame{position:absolute;top:50%;left:50%;transform:translate(-50%,-50%);width:48px;height:48px;pointer-events:none;z-index:4;background-size:contain;background-repeat:no-repeat;background-position:center}
+.seat-mic{position:absolute;top:-18px;left:50%;transform:translateX(-50%);font-size:9px;color:#4ade80;display:none;z-index:5}
+.seat-mic i{animation:mw 1.4s ease-in-out infinite}
+@keyframes mw{0%,100%{opacity:1;transform:scale(1)}50%{opacity:.3;transform:scale(.8)}}
+.seat-uname{position:absolute;top:-16px;left:50%;transform:translateX(-50%);font-size:7px;color:#fff;font-family:'Exo 2';white-space:nowrap;max-width:66px;overflow:hidden;text-overflow:ellipsis;text-align:center;display:none;z-index:3;text-shadow:0 1px 4px rgba(0,0,0,.9);background:rgba(0,0,0,.45);border-radius:4px;padding:1px 4px}
+.seat-img{width:64px;height:72px;background:url('https://freesorgupanel.neocities.org/movie_seat.png') center/contain no-repeat;position:relative;z-index:2;transition:filter .2s,transform .2s;display:flex;align-items:flex-start;justify-content:center;padding-top:6px}
+.seat-num{position:absolute;bottom:4px;font-size:8px;color:rgba(255,255,255,.55);font-weight:700;font-family:'Exo 2';text-shadow:0 1px 3px rgba(0,0,0,.9);z-index:3}
+.seat:hover .seat-img{filter:brightness(1.3) saturate(1.2);transform:translateY(-3px)}
+.seat.occ .seat-img{filter:sepia(.3) hue-rotate(320deg) saturate(1.5)}
+.seat.mine .seat-img{filter:brightness(1.2) sepia(.5) hue-rotate(320deg) saturate(2)}
+.seat.occ .seat-av{display:flex}
+.seat.occ .seat-uname{display:block}
+.seat.voice .seat-mic{display:block}
+
+/* ── CHAT PANE ── */
+#chatPane{flex:1;display:flex;flex-direction:column;overflow:hidden;min-height:0;background:transparent}
+#userStrip{display:none!important}
+#chatBody{flex:1;overflow-y:auto;padding:6px;display:flex;flex-direction:column;gap:3px;-webkit-overflow-scrolling:touch;scrollbar-width:thin;scrollbar-color:rgba(255,255,255,.12) transparent}
+.cmsg{padding:7px 11px;border-radius:9px;word-break:break-word;font-family:'Exo 2';font-size:14px;line-height:1.5;animation:mi .22s var(--r)}
+@keyframes mi{from{opacity:0;transform:translateY(4px)}}
+.cmsg.sys{background:rgba(255,255,255,.05);border:1px solid rgba(255,255,255,.08);color:rgba(255,255,255,.45);font-style:italic;font-size:10.5px;text-align:center}
+.cmsg.gift{background:rgba(245,158,11,.07);border:1px solid rgba(245,158,11,.18);text-align:center;color:rgba(255,255,255,.8)}
+.cmsg.norm{background:rgba(255,255,255,.07);border:1px solid rgba(255,255,255,.07)}
+.cmsg.me{background:rgba(196,18,48,.1);border:1px solid rgba(196,18,48,.2)}
+.ctop{display:flex;align-items:center;gap:5px;margin-bottom:2px}
+/* Chat avatar with frame */
+.cav-wrap{width:22px;height:22px;position:relative;flex-shrink:0}
+.cav{width:22px;height:22px;border-radius:50%;overflow:hidden;background:rgba(255,255,255,.1);border:1.5px solid rgba(255,255,255,.15);display:flex;align-items:center;justify-content:center;font-size:8px;font-weight:700;color:#fff}
+.cav img{width:100%;height:100%;object-fit:cover}
+.cav-frame{position:absolute;inset:-5px;pointer-events:none;background-size:contain;background-repeat:no-repeat;background-position:center;z-index:2}
+.cwho{font-size:10px;font-weight:700;letter-spacing:.03em}
+.wa{color:#fcd34d}.wv{color:#c4b5fd}.wu{color:#67e8f9}.ws{color:rgba(255,255,255,.4)}
+.ctxt{color:rgba(255,255,255,.9);font-size:14px}
+
+/* ── INPUT AREA ── */
+#inputArea{flex-shrink:0;padding:4px 7px;padding-bottom:calc(4px + var(--sb));border-top:1px solid rgba(255,255,255,.07);background:rgba(255,255,255,.05);display:flex;flex-direction:column;gap:3px}
+.qrow{display:flex;gap:3px;overflow-x:auto;scrollbar-width:none;align-items:center}
+.qrow::-webkit-scrollbar{display:none}
+.qchip{flex-shrink:0;background:rgba(255,255,255,.07);border:1px solid rgba(255,255,255,.13);border-radius:8px;padding:2px 6px;font-size:11px;color:rgba(255,255,255,.75);font-family:'Exo 2';cursor:pointer;transition:all .12s;white-space:nowrap}
+.qchip:active{background:rgba(255,255,255,.18);transform:scale(.93)}
+.irow{display:flex;gap:4px;align-items:flex-end}
+#msgIn{flex:1;background:rgba(255,255,255,.09);border:1.5px solid rgba(255,255,255,.16);border-radius:8px;padding:6px 10px;font-family:'Exo 2';font-size:15px;color:#fff;resize:none;max-height:80px;line-height:1.4;transition:border-color .15s}
+#msgIn:focus{border-color:var(--acc2)}
+#msgIn::placeholder{color:rgba(255,255,255,.28)}
+.ibtn{flex-shrink:0;width:38px;height:38px;border-radius:8px;display:flex;align-items:center;justify-content:center;font-size:16px;transition:all .14s}
+.ibtn:active{transform:scale(.88)}
+#sendBtn{background:linear-gradient(135deg,var(--acc),var(--acc2));color:#fff;box-shadow:0 2px 10px rgba(196,18,48,.35)}
+#giftBtn{background:rgba(245,158,11,.1);border:1px solid rgba(245,158,11,.22);color:#fcd34d}
+#micBtn{background:rgba(5,150,105,.07);border:1px solid rgba(5,150,105,.18);color:rgba(255,255,255,.45)}
+#micBtn.on{background:rgba(5,150,105,.2);color:#4ade80;border-color:var(--grn)}
+#micBtn.dim{opacity:.35;cursor:not-allowed}
+#frameBtn{background:rgba(124,58,237,.1);border:1px solid rgba(124,58,237,.22);color:#c4b5fd}
+
+/* ── MODALS ── */
+.mover{position:fixed;inset:0;z-index:600;background:rgba(5,0,10,.6);backdrop-filter:blur(10px);display:flex;align-items:flex-end;justify-content:center;opacity:0;pointer-events:none;transition:opacity .25s}
+.mover.open{opacity:1;pointer-events:all}
+.mbox{background:rgba(255,255,255,.08);border:1px solid rgba(255,255,255,.15);border-top:1px solid rgba(255,255,255,.22);border-radius:18px 18px 0 0;padding:16px 18px calc(18px + var(--sb));width:100%;max-width:540px;max-height:90vh;overflow-y:auto;-webkit-overflow-scrolling:touch;box-shadow:0 -4px 40px rgba(0,0,0,.4);transform:translateY(100%);transition:transform .3s var(--r);backdrop-filter:blur(24px)}
+.mover.open .mbox{transform:none}
+.mhandle{width:32px;height:3px;background:rgba(255,255,255,.18);border-radius:3px;margin:0 auto 14px}
+.mtitle{font-family:'Cinzel Decorative';font-size:15px;background:linear-gradient(135deg,#fff,var(--acc2));-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;margin-bottom:13px;display:flex;align-items:center;gap:8px}
+.mtitle i{-webkit-text-fill-color:var(--acc2);font-size:14px}
+.mf{margin-bottom:11px}
+.mf label{display:flex;align-items:center;gap:5px;font-family:'Exo 2';font-size:9px;color:rgba(255,255,255,.45);font-weight:700;letter-spacing:.08em;margin-bottom:5px}
+.mf label i{font-size:10px;color:var(--acc2)}
+.mi{width:100%;background:rgba(255,255,255,.08);border:1px solid rgba(255,255,255,.15);border-radius:9px;padding:9px 12px;font-family:'Exo 2';font-size:13px;color:#fff;transition:border-color .15s}
+.mi:focus{border-color:var(--acc2)}
+.mi::placeholder{color:rgba(255,255,255,.28)}
+select.mi option{background:#1a0008;color:#fff}
+.mbrow{display:flex;gap:8px;justify-content:flex-end;margin-top:12px;flex-wrap:wrap}
+.mb{padding:9px 17px;border-radius:9px;font-family:'Rajdhani';font-weight:700;font-size:14px;transition:all .14s}
+.mb.p{background:linear-gradient(135deg,var(--acc),var(--acc2));color:#fff;box-shadow:0 2px 10px rgba(196,18,48,.3)}
+.mb.p:active{transform:scale(.95)}
+.mb.s{background:rgba(255,255,255,.07);color:rgba(255,255,255,.65);border:1px solid rgba(255,255,255,.14)}
+.mb.danger{background:rgba(225,29,72,.15);color:#ff6b7a;border:1px solid rgba(225,29,72,.28)}
+
+/* ── FRAME MODAL ── */
+.frame-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:10px;margin-top:8px}
+.frame-cell{display:flex;flex-direction:column;align-items:center;gap:6px;cursor:pointer;padding:8px 6px;border-radius:10px;border:1.5px solid rgba(255,255,255,.1);background:rgba(255,255,255,.05);transition:all .15s}
+.frame-cell:hover,.frame-cell.sel{border-color:var(--acc2);background:rgba(230,57,80,.1)}
+.frame-preview{width:56px;height:56px;position:relative;display:flex;align-items:center;justify-content:center}
+.frame-preview-av{width:36px;height:36px;border-radius:50%;background:rgba(255,255,255,.15);position:relative;z-index:1;display:flex;align-items:center;justify-content:center;font-size:14px;overflow:hidden}
+.frame-preview-av img{width:100%;height:100%;object-fit:cover}
+.frame-preview-img{position:absolute;inset:0;background-size:contain;background-repeat:no-repeat;background-position:center;z-index:2;pointer-events:none}
+.frame-name{font-family:'Exo 2';font-size:9px;color:rgba(255,255,255,.6);text-align:center}
+.frame-none{width:36px;height:36px;border-radius:50%;border:2px dashed rgba(255,255,255,.2);display:flex;align-items:center;justify-content:center;font-size:10px;color:rgba(255,255,255,.3)}
+
+/* ── ADMIN ITEM LIST ── */
+.item-list{display:flex;flex-direction:column;gap:6px;margin-top:8px}
+.item-row{display:flex;align-items:center;gap:8px;background:rgba(255,255,255,.06);border:1px solid rgba(255,255,255,.1);border-radius:8px;padding:8px 10px}
+.item-thumb{width:36px;height:36px;flex-shrink:0;border-radius:6px;background:rgba(255,255,255,.08);overflow:hidden;display:flex;align-items:center;justify-content:center;font-size:18px}
+.item-thumb img{width:100%;height:100%;object-fit:cover}
+.item-info{flex:1;min-width:0}
+.item-name{font-size:12px;font-weight:600;color:#fff;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.item-type{font-size:9px;color:rgba(255,255,255,.4);font-family:'Exo 2';text-transform:uppercase;letter-spacing:.08em}
+.item-del{background:rgba(225,29,72,.12);border:1px solid rgba(225,29,72,.25);border-radius:6px;padding:4px 8px;font-size:11px;color:#fc6b6b;cursor:pointer;flex-shrink:0}
+
+/* ── GIFT MODAL ── */
+.ggrid{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;margin-top:8px}
+.gcell{text-align:center;padding:10px 5px;border-radius:10px;cursor:pointer;border:1.5px solid rgba(255,255,255,.1);background:rgba(255,255,255,.06);transition:all .13s;color:rgba(255,255,255,.8)}
+.gcell.sel,.gcell:active{border-color:var(--gold);background:rgba(245,158,11,.1)}
+.gic{width:48px;height:48px;margin:0 auto;border-radius:8px;overflow:hidden;display:flex;align-items:center;justify-content:center;font-size:24px}
+.gic img{width:100%;height:100%;object-fit:cover}
+.gnm{font-size:9px;color:rgba(255,255,255,.5);margin-top:4px;font-family:'Exo 2'}
+
+/* ── USER CARDS ── */
+.ucards{display:flex;flex-direction:column;gap:5px;margin-top:8px}
+.ucard{display:flex;align-items:center;gap:8px;padding:8px 10px;border-radius:9px;background:rgba(255,255,255,.06);border:1px solid rgba(255,255,255,.09);transition:all .14s}
+.ucard.ac{border-left:3px solid var(--gold)}
+.ucard.vc{border-left:3px solid var(--vio)}
+.uc-av{width:32px;height:32px;border-radius:50%;overflow:hidden;flex-shrink:0;background:rgba(255,255,255,.1);border:2px solid rgba(255,255,255,.15);display:flex;align-items:center;justify-content:center;font-size:11px;font-weight:700;color:#fff}
+.uc-av img{width:100%;height:100%;object-fit:cover}
+.uc-info{flex:1;min-width:0}
+.uc-name{font-size:13px;font-weight:600;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;color:#fff}
+.uc-meta{font-size:8.5px;color:rgba(255,255,255,.4);font-family:'Exo 2';margin-top:1px;display:flex;gap:4px;align-items:center}
+.lb{background:rgba(196,18,48,.13);border:1px solid rgba(196,18,48,.26);color:#fca5a5;font-size:8px;padding:1px 4px;border-radius:4px;font-weight:700}
+.uc-acts{display:flex;gap:4px}
+.ua{background:rgba(255,255,255,.07);border:none;border-radius:5px;padding:4px 7px;font-size:11px;color:rgba(255,255,255,.45);cursor:pointer;transition:background .12s}
+.ua:active{background:rgba(255,255,255,.16)}
+.ua.d{color:#fc6b6b}
+
+/* ── AVATAR MODAL ── */
+.av-prev{width:70px;height:70px;border-radius:50%;border:3px solid rgba(255,255,255,.18);overflow:hidden;background:rgba(255,255,255,.08);margin:0 auto 12px;display:flex;align-items:center;justify-content:center;font-size:18px;font-weight:700;color:#fff}
+.av-prev img{width:100%;height:100%;object-fit:cover;display:none}
+
+/* ── ECHIPS ── */
+.echips{display:flex;gap:6px;flex-wrap:wrap;margin-top:6px}
+.echip{background:rgba(255,255,255,.06);border:1.5px solid rgba(255,255,255,.12);border-radius:8px;padding:6px 11px;font-size:11px;cursor:pointer;font-family:'Exo 2';transition:all .13s;color:rgba(255,255,255,.65)}
+.echip.sel{border-color:var(--acc2);background:rgba(230,57,80,.12);color:#fff}
+
+/* ── FX OVERLAY ── */
+#fxOv{position:fixed;inset:0;z-index:700;pointer-events:none;overflow:hidden}
+.ent-fx{position:absolute;top:50%;left:50%;transform:translate(-50%,-50%);text-align:center;background:rgba(10,0,5,.9);border:1px solid rgba(196,18,48,.4);border-radius:16px;padding:20px 26px;backdrop-filter:blur(20px);box-shadow:0 8px 44px rgba(196,18,48,.3);animation:eIn .45s var(--r),eOut .4s 4.5s forwards}
+@keyframes eIn{from{opacity:0;transform:translate(-50%,-50%) scale(.6)}to{opacity:1;transform:translate(-50%,-50%) scale(1)}}
+@keyframes eOut{to{opacity:0;transform:translate(-50%,-50%) scale(1.06)}}
+.ent-ic{font-size:34px;animation:boun .7s ease;display:block;margin-bottom:8px}
+@keyframes boun{0%,100%{transform:translateY(0)}40%{transform:translateY(-12px)}}
+.ent-name{font-family:'Cinzel Decorative';font-size:17px;background:linear-gradient(135deg,#fff,var(--acc2));-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text}
+.ent-sub{font-family:'Exo 2';font-size:10px;color:rgba(255,255,255,.4);margin-top:5px}
+/* Kişiye özel giriş efekti – tam ekran medya */
+#entVidOv{position:fixed;inset:0;z-index:750;background:rgba(5,0,10,.92);display:none;flex-direction:column;align-items:center;justify-content:center;gap:16px}
+#entVidOv.show{display:flex}
+#entVidEl{max-width:min(520px,90vw);max-height:55vh;border-radius:14px;box-shadow:0 0 60px rgba(196,18,48,.5)}
+#entImgEl{max-width:min(520px,90vw);max-height:55vh;border-radius:14px;box-shadow:0 0 60px rgba(196,18,48,.5);display:none}
+.evn{font-family:'Cinzel Decorative';font-size:clamp(13px,4vw,22px);background:linear-gradient(135deg,#fff,var(--acc2));-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;text-align:center;padding:0 16px}
+/* Gift FX */
+#giftFxOv{position:fixed;inset:0;z-index:760;pointer-events:none;display:flex;align-items:center;justify-content:center}
+.gift-fx-media{position:absolute;top:0;left:0;width:100%;height:100%;object-fit:cover;opacity:.88;border-radius:0;display:none}
+.gift-fx-media.show{display:block;animation:gfIn .3s var(--r),gfOut .5s 3.5s forwards}
+@keyframes gfIn{from{opacity:0;transform:scale(.8)}to{opacity:.88;transform:scale(1)}}
+@keyframes gfOut{to{opacity:0;transform:scale(1.05)}}
+.gift-info{position:relative;z-index:2;text-align:center;animation:gIn .35s var(--r),gOut .3s 3.6s forwards}
+@keyframes gIn{from{opacity:0;transform:scale(.4)}to{opacity:1;transform:scale(1)}}
+@keyframes gOut{to{opacity:0;transform:translateY(-18px)}}
+.gift-big{font-size:56px;animation:gb .5s ease;line-height:1}
+@keyframes gb{0%,100%{transform:scale(1)}50%{transform:scale(1.3)}}
+.gift-lbl{font-family:'Exo 2';font-size:13px;color:#fff;margin-top:8px;background:rgba(10,0,5,.85);padding:5px 12px;border-radius:8px;border:1px solid rgba(255,255,255,.12)}
+/* sparkles */
+.sparkle{position:absolute;pointer-events:none;animation:sp 1.8s forwards}
+@keyframes sp{0%{opacity:0;transform:scale(0)}20%{opacity:1;transform:scale(1)}80%{opacity:.6}100%{opacity:0;transform:scale(0) translateY(-25px)}}
+
+/* ── FULLSCREEN VIDEO ── */
+#playerWrap.fs-mode{
+  position:fixed!important;inset:0!important;z-index:550!important;
+  height:100dvh!important;width:100vw!important;
+  background:#000!important;
+}
+#playerWrap.fs-mode::before{z-index:5}
+#fsCloseBtn{
+  position:absolute;top:10px;right:10px;z-index:560;
+  background:rgba(0,0,0,.6);border:1px solid rgba(255,255,255,.2);
+  border-radius:8px;padding:6px 10px;font-size:14px;color:#fff;
+  display:none;cursor:pointer;backdrop-filter:blur(8px);
+}
+#playerWrap.fs-mode #fsCloseBtn{display:block}
+/* Force landscape hint on mobile */
+@media(max-width:767px) and (orientation:portrait){
+  #playerWrap.fs-mode{
+    transform:rotate(90deg);
+    transform-origin:center center;
+    width:100dvh!important;
+    height:100vw!important;
+    top:calc(50dvh - 50vw)!important;
+    left:calc(50vw - 50dvh)!important;
+    inset:unset!important;
+  }
+}
+#notifs{position:fixed;top:calc(36px + var(--st) + 6px);left:50%;transform:translateX(-50%);z-index:800;display:flex;flex-direction:column;gap:5px;align-items:center;pointer-events:none}
+.notif{background:rgba(10,0,5,.92);border:1px solid rgba(196,18,48,.28);border-radius:9px;padding:7px 13px;font-size:11.5px;font-family:'Exo 2';color:#fff;backdrop-filter:blur(16px);box-shadow:0 4px 18px rgba(0,0,0,.3);animation:nIn .2s ease;white-space:nowrap}
+@keyframes nIn{from{opacity:0;transform:translateY(-7px)}}
+.notif.out{animation:nOut .22s ease forwards}
+@keyframes nOut{to{opacity:0;transform:translateY(-7px)}}
+
+/* ── TABS (admin modal) ── */
+.tab-row{display:flex;gap:4px;margin-bottom:14px;border-bottom:1px solid rgba(255,255,255,.1);padding-bottom:8px}
+.tab-btn{font-family:'Exo 2';font-size:10px;font-weight:700;letter-spacing:.06em;color:rgba(255,255,255,.45);padding:5px 10px;border-radius:6px;cursor:pointer;transition:all .15s;border:none;background:none}
+.tab-btn.act{background:rgba(230,57,80,.15);color:#fff;border:1px solid rgba(230,57,80,.3)}
+.tab-pane{display:none}
+.tab-pane.act{display:block}
+/* ── SEARCH RESULTS ── */
+.yt-result{display:flex;gap:10px;padding:8px;border-radius:9px;background:rgba(255,255,255,.05);border:1px solid rgba(255,255,255,.09);cursor:pointer;transition:all .14s;align-items:center}
+.yt-result:hover{background:rgba(196,18,48,.1);border-color:rgba(196,18,48,.3)}
+.yt-thumb{width:72px;height:48px;border-radius:6px;object-fit:cover;flex-shrink:0;background:rgba(255,255,255,.06)}
+.yt-info{flex:1;min-width:0}
+.yt-title{font-size:12px;font-weight:600;color:#fff;overflow:hidden;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;line-height:1.4}
+.yt-ch{font-family:'Exo 2';font-size:9px;color:rgba(255,255,255,.4);margin-top:3px}
+.yt-add{flex-shrink:0;background:rgba(196,18,48,.15);border:1px solid rgba(196,18,48,.3);border-radius:6px;padding:5px 8px;font-size:11px;color:#fca5a5;cursor:pointer}
+/* ── PLAYLIST ── */
+.pl-item{display:flex;gap:8px;align-items:center;padding:7px 9px;border-radius:8px;background:rgba(255,255,255,.05);border:1px solid rgba(255,255,255,.09);transition:all .13s}
+.pl-item.pl-active{background:rgba(196,18,48,.12);border-color:rgba(196,18,48,.35)}
+.pl-item.pl-active .pl-num{color:var(--acc2)}
+.pl-num{font-family:'Exo 2';font-size:10px;color:rgba(255,255,255,.3);font-weight:700;width:18px;flex-shrink:0;text-align:center}
+.pl-ttl{flex:1;font-size:12px;color:#fff;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.pl-src{font-family:'Exo 2';font-size:9px;color:rgba(255,255,255,.35);flex-shrink:0}
+.pl-del{background:none;border:none;color:rgba(255,255,255,.25);font-size:12px;cursor:pointer;padding:2px 5px;flex-shrink:0}
+.pl-del:hover{color:#fc6b6b}
+.pl-play{background:rgba(255,255,255,.07);border:1px solid rgba(255,255,255,.12);border-radius:5px;padding:4px 7px;font-size:10px;color:rgba(255,255,255,.6);cursor:pointer;flex-shrink:0}
+.pl-play:hover{background:rgba(196,18,48,.15);color:#fca5a5}
+</style>
+</head>
+<body>
+
+<div id="bgFixed"></div>
+<div id="bgLayer" style="display:none"><video id="bgVideo" autoplay muted loop playsinline></video><div id="bgImg"></div></div>
+
+<!-- LOADER -->
+<div id="loader">
+  <div class="ld-strip"><div class="ld-f"></div><div class="ld-f"></div><div class="ld-f"></div><div class="ld-f"></div><div class="ld-f"></div></div>
+  <div class="ld-logo">🎬 Maya Film</div>
+  <div class="ld-sub2">SİNEMA SALONU</div>
+  <div class="ld-bar"><div class="ld-fill" id="ldFill"></div></div>
+</div>
+
+<!-- JOIN -->
+<div id="joinScreen">
+  <div class="jcard">
+    <div class="jlogo">🎬 Maya Film</div>
+    <div class="jsub">ÖZEL SİNEMA SALONU</div>
+    <div class="jf">
+      <label><i class="fa-solid fa-user"></i> KULLANICI ADI</label>
+      <input class="jin" id="jName" placeholder="Adinizi girin..." maxlength="22"/>
+    </div>
+    <div class="jf">
+      <label><i class="fa-solid fa-image"></i> PROFİL RESMİ URL</label>
+      <div class="av-row">
+        <input class="jin" id="jAvUrl" placeholder="https://..." oninput="prevJAv()"/>
+        <div class="av-thumb" id="jAvThumb"><img id="jAvImg" alt=""/><i class="fa-solid fa-user" id="jAvIco"></i></div>
+      </div>
+    </div>
+    <div class="admin-note" id="adminNote"><i class="fa-solid fa-crown" style="color:var(--gold)"></i><span>Yönetici olarak giriş yapıyorsunuz</span></div>
+    <button class="jbtn" onclick="joinRoom()"><i class="fa-solid fa-door-open"></i> ODAYA GİR</button>
+    <div class="saved-hint" id="savedHint" style="display:none" onclick="autoJoin()">Önceki hesapla devam et: <span id="savedName"></span></div>
+  </div>
+</div>
+
+<!-- APP -->
+<div id="app">
+  <header id="hdr">
+    <div class="hlogo">🎬 Maya</div>
+    <div class="hname" id="hRoomName">Maya Film</div>
+    <div class="hsp"></div>
+    <div class="hlive"><div class="hdot"></div>CANLI</div>
+    <div class="hcnt"><i class="fa-solid fa-users"></i><span id="hCnt">0</span></div>
+    <div id="myAvBtn" onclick="openModal('avatarModal')">
+      <img id="myAvImg" alt=""/>
+      <span id="myAvInit">?</span>
+      <div class="frame-overlay" id="myFrameOv"></div>
+    </div>
+    <button class="hbtn" style="color:#c4b5fd;border-color:rgba(124,58,237,.28)" onclick="openModal('frameModal')"><i class="fa-solid fa-picture-frame"></i></button>
+    <button class="hbtn gold" id="adminBtn" style="display:none" onclick="openModal('adminModal')"><i class="fa-solid fa-gear"></i></button>
+    <button class="hbtn" onclick="openModal('usersModal')"><i class="fa-solid fa-users"></i></button>
+    <button class="hbtn red" onclick="leaveRoom()"><i class="fa-solid fa-right-from-bracket"></i></button>
+  </header>
+
+  <div id="main">
+    <div id="videoPane">
+      <div id="playerWrap">
+        <button id="fsCloseBtn" onclick="toggleFullscreen()"><i class="fa-solid fa-compress"></i></button>
+        <div id="placeholder"><div class="ph-ic"><i class="fa-solid fa-clapperboard"></i></div><div class="ph-t">Video bekleniyor...</div></div>
+      </div>
+      <div id="vidBar">
+        <i class="fa-solid fa-circle-play" style="font-size:9px;color:var(--acc2);flex-shrink:0"></i>
+        <div id="vidTitle">Yayın bekleniyor...</div>
+        <span class="vbadge" id="vTypeBadge" style="display:none"></span>
+        <button class="vsm" id="adminPlayPauseBtn" style="display:none" onclick="adminTogglePlay()" title="Oynat/Durdur"><i class="fa-solid fa-pause" id="adminPlayPauseIco"></i></button>
+        <button class="vsm" onclick="doSync()" title="Senkronize et"><i class="fa-solid fa-rotate"></i></button>
+        <button class="vsm" onclick="toggleFullscreen()" title="Tam ekran"><i class="fa-solid fa-expand" id="fsIco"></i></button>
+      </div>
+      <div id="adminCtrl">
+        <div style="display:flex;gap:4px;width:100%;align-items:center">
+          <input id="vUrl" placeholder="YouTube/Twitch/Dailymotion/Vimeo/OK.ru/Rutube/MP4..." type="url" style="flex:1;min-width:0;font-family:'Exo 2';font-size:11px;background:rgba(255,255,255,.08);border:1px solid var(--brd);border-radius:7px;padding:6px 8px;color:#fff"/>
+          <button class="vcbtn" onclick="submitVideo()" title="Oynat"><i class="fa-solid fa-play"></i></button>
+          <button class="vcbtn" onclick="stopVideo()" style="color:#fc6b6b" title="Durdur"><i class="fa-solid fa-stop"></i></button>
+          <button class="vcbtn" style="color:#fcd34d" onclick="openModal('searchModal')" title="YouTube Ara"><i class="fa-brands fa-youtube"></i></button>
+          <button class="vcbtn" style="color:#a78bfa" onclick="openModal('playlistModal')" title="Oynatma Listesi"><i class="fa-solid fa-list"></i></button>
+        </div>
+      </div>
+      <div id="seatsArea">
+        <div class="slbl"><i class="fa-solid fa-couch"></i> KOLTUKLAR <span style="margin-left:auto;color:#4ade80;font-size:9px;font-weight:400" id="voiceLbl"></span></div>
+        <div id="seatRow"></div>
+      </div>
+    </div>
+    <div id="chatPane">
+      <div id="userStrip"></div>
+      <div id="chatBody"></div>
+      <div id="inputArea">
+        <div class="qrow">
+          <span style="font-size:9px;color:rgba(255,255,255,.35);flex-shrink:0"><i class="fa-solid fa-fire" style="color:#fc6b6b"></i></span>
+          <div class="qchip" onclick="qi('❤️')">❤️</div>
+          <div class="qchip" onclick="qi('😂')">😂</div>
+          <div class="qchip" onclick="qi('🔥')">🔥</div>
+          <div class="qchip" onclick="qi('👏')">👏</div>
+          <div class="qchip" onclick="qi('🍿')">🍿</div>
+          <div class="qchip" onclick="qi('⭐')">⭐</div>
+          <div class="qchip" onclick="qi('😍')">😍</div>
+          <div class="qchip" onclick="qi('💯')">💯</div>
+        </div>
+        <div class="irow">
+          <textarea id="msgIn" rows="1" placeholder="Mesaj yaz..."></textarea>
+          <button class="ibtn" id="micBtn" onclick="toggleMic()"><i class="fa-solid fa-microphone-slash"></i></button>
+          <button class="ibtn" id="frameBtn" onclick="openModal('frameModal')"><i class="fa-solid fa-circle-user"></i></button>
+          <button class="ibtn" id="giftBtn" onclick="openModal('giftModal')"><i class="fa-solid fa-gift"></i></button>
+          <button class="ibtn" id="sendBtn" onclick="sendChat()"><i class="fa-solid fa-paper-plane"></i></button>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- FX -->
+<div id="fxOv"></div>
+<div id="entVidOv">
+  <video id="entVidEl" autoplay playsinline></video>
+  <img id="entImgEl" alt=""/>
+  <div class="evn" id="entVidName"></div>
+</div>
+<div id="giftFxOv">
+  <video class="gift-fx-media" id="giftFxVid" autoplay muted loop playsinline></video>
+  <img class="gift-fx-media" id="giftFxImg" alt=""/>
+  <div class="gift-info" id="giftFxInfo" style="display:none"></div>
+</div>
+<div id="notifs"></div>
+
+<!-- FRAME MODAL -->
+<div class="mover" id="frameModal" onclick="closeModal('frameModal')">
+  <div class="mbox" onclick="event.stopPropagation()">
+    <div class="mhandle"></div>
+    <div class="mtitle"><i class="fa-solid fa-circle-user"></i> Görünüm</div>
+    <div class="tab-row" id="frameTabRow">
+      <button class="tab-btn act" onclick="showFrameTab('ftFrames',this)">🖼️ Çerçeveler</button>
+      <button class="tab-btn" onclick="showFrameTab('ftEntrance',this)">✨ Giriş Efektim</button>
+    </div>
+    <!-- Tab: Çerçeveler -->
+    <div id="ftFrames">
+      <div class="frame-grid" id="frameGrid"></div>
+    </div>
+    <!-- Tab: Giriş Efektleri -->
+    <div id="ftEntrance" style="display:none">
+      <div style="font-family:'Exo 2';font-size:10px;color:rgba(255,255,255,.4);margin-bottom:10px;line-height:1.6">
+        Girişte oynatılacak kişisel efektini seç. Seçili efekt odaya her girişinde otomatik oynatılır.
+      </div>
+      <div class="frame-grid" id="entranceGrid"></div>
+    </div>
+    <div class="mbrow" style="margin-top:14px">
+      <button class="mb s" onclick="closeModal('frameModal')">Kapat</button>
+    </div>
+  </div>
+</div>
+
+<!-- YOUTUBE SEARCH MODAL -->
+<div class="mover" id="searchModal" onclick="closeModal('searchModal')">
+  <div class="mbox" onclick="event.stopPropagation()" style="max-height:85vh">
+    <div class="mhandle"></div>
+    <div class="mtitle"><i class="fa-brands fa-youtube" style="color:#fc6b6b"></i> YouTube Ara</div>
+    <div style="display:flex;gap:6px;margin-bottom:10px">
+      <input class="mi" id="ytSearchQ" placeholder="Film, dizi, video ara..." style="flex:1" onkeydown="if(event.key==='Enter')ytSearch()"/>
+      <button class="mb p" style="padding:9px 14px;flex-shrink:0" onclick="ytSearch()"><i class="fa-solid fa-search"></i></button>
+    </div>
+    <div id="ytSearchResults" style="display:flex;flex-direction:column;gap:6px;max-height:55vh;overflow-y:auto"></div>
+  </div>
+</div>
+
+<!-- PLAYLIST MODAL -->
+<div class="mover" id="playlistModal" onclick="closeModal('playlistModal')">
+  <div class="mbox" onclick="event.stopPropagation()" style="max-height:85vh">
+    <div class="mhandle"></div>
+    <div class="mtitle"><i class="fa-solid fa-list" style="color:#a78bfa"></i> Oynatma Listesi</div>
+    <div id="plNowPlaying" style="display:none;background:rgba(196,18,48,.1);border:1px solid rgba(196,18,48,.25);border-radius:8px;padding:8px 10px;margin-bottom:10px;font-family:'Exo 2';font-size:11px;color:#fca5a5"></div>
+    <div style="display:flex;gap:6px;margin-bottom:10px">
+      <input class="mi" id="plUrl" placeholder="URL ekle (herhangi platform)..." style="flex:1" onkeydown="if(event.key==='Enter')plAdd()"/>
+      <input class="mi" id="plTitle" placeholder="Başlık (opsiyonel)" style="width:110px;flex-shrink:0"/>
+      <button class="mb p" style="padding:9px 12px;flex-shrink:0" onclick="plAdd()"><i class="fa-solid fa-plus"></i></button>
+    </div>
+    <div id="plList" style="display:flex;flex-direction:column;gap:5px;max-height:50vh;overflow-y:auto"></div>
+    <div class="mbrow" style="margin-top:10px">
+      <button class="mb s" onclick="closeModal('playlistModal')">Kapat</button>
+      <button class="mb p" id="plNextBtn" onclick="plNext()" style="display:none"><i class="fa-solid fa-forward-step"></i> Sonraki</button>
+    </div>
+  </div>
+</div>
+
+<!-- GIFT MODAL -->
+<div class="mover" id="giftModal" onclick="closeModal('giftModal')">
+  <div class="mbox" onclick="event.stopPropagation()">
+    <div class="mhandle"></div>
+    <div class="mtitle"><i class="fa-solid fa-gift"></i> Hediye Gönder</div>
+    <div class="mf"><label><i class="fa-solid fa-user"></i> ALICI</label><select class="mi" id="giftTo"></select></div>
+    <div class="mf"><label><i class="fa-solid fa-star"></i> HEDİYE</label><div class="ggrid" id="giftGrid"></div></div>
+    <div class="mbrow"><button class="mb s" onclick="closeModal('giftModal')">İptal</button><button class="mb p" onclick="sendGift()"><i class="fa-solid fa-paper-plane"></i> Gönder</button></div>
+  </div>
+</div>
+
+<!-- USERS MODAL -->
+<div class="mover" id="usersModal" onclick="closeModal('usersModal')">
+  <div class="mbox" onclick="event.stopPropagation()">
+    <div class="mhandle"></div>
+    <div class="mtitle"><i class="fa-solid fa-users"></i> Kullanıcılar</div>
+    <div class="ucards" id="userCards"></div>
+  </div>
+</div>
+
+<!-- ADMIN MODAL -->
+<div class="mover" id="adminModal" onclick="closeModal('adminModal')">
+  <div class="mbox" onclick="event.stopPropagation()">
+    <div class="mhandle"></div>
+    <div class="mtitle"><i class="fa-solid fa-gear"></i> Maya Film Yönetimi</div>
+    <div class="tab-row">
+      <button class="tab-btn act" onclick="showTab('tabRoom')">🏠 Oda</button>
+      <button class="tab-btn" onclick="showTab('tabItems')">🖼️ Çerçeve/Efekt</button>
+      <button class="tab-btn" onclick="showTab('tabGifts')">🎁 Hediyeler</button>
+    </div>
+
+    <!-- TAB: ODA -->
+    <div class="tab-pane act" id="tabRoom">
+      <div class="mf"><label><i class="fa-solid fa-door-open"></i> ODA ADI</label><input class="mi" id="adName" placeholder="Maya Film"/></div>
+      <div class="mf"><label><i class="fa-solid fa-video"></i> GİRİŞ EFEKTİ VİDEO (admin girişi)</label><input class="mi" id="adEntVid" placeholder="https://... kısa mp4"/></div>
+      <div class="mf"><label><i class="fa-solid fa-wand-sparkles"></i> EFEKTİ TÜRÜ</label><div class="echips" id="effectChips"></div></div>
+      <div class="mbrow">
+        <button class="mb danger" onclick="clearChat()"><i class="fa-solid fa-trash"></i> Sohbeti Sıfırla</button>
+        <button class="mb s" onclick="closeModal('adminModal')">İptal</button>
+        <button class="mb p" onclick="applyAdmin()"><i class="fa-solid fa-check"></i> Kaydet</button>
+      </div>
+    </div>
+
+    <!-- TAB: ÇERÇEVE + EFEKT -->
+    <div class="tab-pane" id="tabItems">
+      <div style="background:rgba(255,255,255,.05);border:1px solid rgba(255,255,255,.1);border-radius:10px;padding:12px;margin-bottom:12px">
+        <div style="font-family:'Exo 2';font-size:10px;color:rgba(255,255,255,.5);font-weight:700;letter-spacing:.08em;margin-bottom:10px">YENİ EKLE</div>
+        <div class="mf"><label><i class="fa-solid fa-tag"></i> İSİM</label><input class="mi" id="niName" placeholder="Romantik Çerçeve"/></div>
+        <div class="mf"><label><i class="fa-solid fa-list"></i> TÜR</label>
+          <select class="mi" id="niType">
+            <option value="frame">🖼️ Çerçeve (frame)</option>
+            <option value="entrance">✨ Giriş Efekti (entrance)</option>
+          </select>
+        </div>
+        <div class="mf"><label><i class="fa-solid fa-link"></i> URL (resim/gif/mp4)</label><input class="mi" id="niUrl" placeholder="https://..."/></div>
+        <button class="mb p" style="width:100%;margin-top:4px" onclick="addItem()"><i class="fa-solid fa-plus"></i> Ekle</button>
+      </div>
+      <div class="item-list" id="adminItemList"></div>
+    </div>
+
+    <!-- TAB: HEDİYELER -->
+    <div class="tab-pane" id="tabGifts">
+      <div style="background:rgba(255,255,255,.05);border:1px solid rgba(255,255,255,.1);border-radius:10px;padding:12px;margin-bottom:12px">
+        <div style="font-family:'Exo 2';font-size:10px;color:rgba(255,255,255,.5);font-weight:700;letter-spacing:.08em;margin-bottom:10px">YENİ HEDİYE EKLE</div>
+        <div class="mf"><label><i class="fa-solid fa-tag"></i> İSİM</label><input class="mi" id="ngName" placeholder="Gül Buketi"/></div>
+        <div class="mf"><label><i class="fa-solid fa-image"></i> HEDİYE RESMİ URL (resim/gif)</label><input class="mi" id="ngUrl" placeholder="https://..."/></div>
+        <div class="mf"><label><i class="fa-solid fa-film"></i> ATILINCA EFEKTİ (mp4/gif/resim)</label><input class="mi" id="ngEffect" placeholder="https://... (isteğe bağlı)"/></div>
+        <button class="mb p" style="width:100%;margin-top:4px" onclick="addGift()"><i class="fa-solid fa-plus"></i> Hediye Ekle</button>
+      </div>
+      <div class="item-list" id="adminGiftList"></div>
+    </div>
+  </div>
+</div>
+
+<!-- AVATAR MODAL -->
+<div class="mover" id="avatarModal" onclick="closeModal('avatarModal')">
+  <div class="mbox" onclick="event.stopPropagation()">
+    <div class="mhandle"></div>
+    <div class="mtitle"><i class="fa-solid fa-user-pen"></i> Profil Resmi</div>
+    <div class="av-prev" id="avPrev"><img id="avPrevImg" alt=""/><i class="fa-solid fa-user" id="avPrevIco"></i></div>
+    <div class="mf"><label><i class="fa-solid fa-link"></i> RESİM URL</label><input class="mi" id="avInput" placeholder="https://..." oninput="prevAv()"/></div>
+    <div class="mbrow"><button class="mb s" onclick="closeModal('avatarModal')">İptal</button><button class="mb p" onclick="saveAvatar()"><i class="fa-solid fa-check"></i> Kaydet</button></div>
+  </div>
+</div>
+
+<script>
+/* ══ GLOBALS ══ */
+const IS_ADMIN = new URLSearchParams(location.search).has('isAdmin');
+let ws=null, me={}, users=[], roomSettings={}, videoState={};
+let allItems=[], ownedItems=[], selGift=null, selEffect='royal', selFrame='', selEntrance='';
+let localStream=null, micOn=false;
+const peers={};
+let syncInterval=null; // admin her saniye sync gönderir
+let fsMode=false;
+
+const ICE_SERVERS=[
+  {urls:'stun:stun.l.google.com:19302'},{urls:'stun:stun1.l.google.com:19302'},
+  {urls:'stun:stun.relay.metered.ca:80'},
+  {urls:'turn:global.relay.metered.ca:80',username:'83eebabf8b1cce9b5eab',credential:'2D7JvfkOQtBdYW3R'},
+  {urls:'turn:global.relay.metered.ca:80?transport=tcp',username:'83eebabf8b1cce9b5eab',credential:'2D7JvfkOQtBdYW3R'},
+  {urls:'turn:global.relay.metered.ca:443',username:'83eebabf8b1cce9b5eab',credential:'2D7JvfkOQtBdYW3R'},
+  {urls:'turns:global.relay.metered.ca:443?transport=tcp',username:'83eebabf8b1cce9b5eab',credential:'2D7JvfkOQtBdYW3R'}
+];
+
+const EFFECTS=[{id:'royal',label:'Kraliyet'},{id:'sparkle',label:'Işıltılı'},{id:'fire',label:'Ateş'},{id:'normal',label:'Standart'}];
+let activePlayer=null;
+
+/* ══ LOCALSTORAGE ══ */
+const LS_KEY='mayaFilm_profile';
+function saveProfile(n,a){try{localStorage.setItem(LS_KEY,JSON.stringify({name:n,avatar:a}));}catch(e){}}
+function loadProfile(){try{return JSON.parse(localStorage.getItem(LS_KEY)||'null');}catch(e){return null;}}
+
+/* ══ LOADER ══ */
+function runLoader(cb){
+  const fill=document.getElementById('ldFill');let p=0;
+  const t=setInterval(()=>{p+=Math.random()*18+4;if(p>=100){p=100;clearInterval(t);setTimeout(cb,250);}fill.style.width=p+'%';},90);
+}
+
+/* ══ INIT ══ */
+window.addEventListener('DOMContentLoaded',()=>{
+  if(IS_ADMIN)document.getElementById('adminNote').classList.add('show');
+  // floating particles
+  const js=document.getElementById('joinScreen');
+  ['✦','◆','▲','●','★','♦','🎬','🍿'].forEach((s,i)=>{
+    const p=document.createElement('div');p.className='jp';
+    p.textContent=s;
+    p.style.cssText=`left:${4+i*12}%;font-size:${10+Math.random()*14}px;color:rgba(230,57,80,${.06+Math.random()*.16});animation-duration:${14+Math.random()*12}s;animation-delay:${Math.random()*9}s`;
+    js.prepend(p);
+  });
+  // effect chips
+  const ec=document.getElementById('effectChips');
+  EFFECTS.forEach(ef=>{
+    const d=document.createElement('div');d.className='echip'+(ef.id===selEffect?' sel':'');d.textContent=ef.label;
+    d.onclick=()=>{selEffect=ef.id;ec.querySelectorAll('.echip').forEach(x=>x.classList.remove('sel'));d.classList.add('sel');};
+    ec.appendChild(d);
+  });
+  // seats
+  const sr=document.getElementById('seatRow');
+  for(let i=1;i<=9;i++){
+    const s=document.createElement('div');s.className='seat';s.id='seat'+i;
+    s.innerHTML=`
+      <div class="seat-mic"><i class="fa-solid fa-microphone"></i></div>
+      <div class="seat-av" id="sav${i}">
+        <div class="seat-av-inner"><img id="savImg${i}" alt=""/><span id="savInit${i}"></span></div>
+        <div class="seat-frame" id="savFrame${i}"></div>
+      </div>
+      <div class="seat-uname" id="sun${i}"></div>
+      <div class="seat-img"><div class="seat-num">${i}</div></div>`;
+    s.onclick=()=>clickSeat(i);sr.appendChild(s);
+  }
+  // chat input
+  const mi=document.getElementById('msgIn');
+  mi.addEventListener('keydown',e=>{if(e.key==='Enter'&&!e.shiftKey){e.preventDefault();sendChat();}});
+  mi.addEventListener('input',()=>{mi.style.height='auto';mi.style.height=Math.min(mi.scrollHeight,76)+'px';});
+  document.getElementById('jName').addEventListener('keydown',e=>{if(e.key==='Enter')joinRoom();});
+  // saved profile
+  const saved=loadProfile();
+  if(saved?.name){
+    document.getElementById('jName').value=saved.name;
+    if(saved.avatar){document.getElementById('jAvUrl').value=saved.avatar;prevJAv();}
+    document.getElementById('savedName').textContent=saved.name;
+    document.getElementById('savedHint').style.display='block';
+  }
+  runLoader(()=>{
+    document.getElementById('loader').classList.add('gone');
+    if(saved?.name)setTimeout(()=>autoJoin(),350);
+  });
+});
+
+/* ══ TAB ══ */
+function showTab(id){
+  document.querySelectorAll('.tab-pane').forEach(p=>p.classList.remove('act'));
+  document.querySelectorAll('.tab-btn').forEach(b=>b.classList.remove('act'));
+  document.getElementById(id).classList.add('act');
+  event.currentTarget.classList.add('act');
+}
+
+/* ══ JOIN ══ */
+function autoJoin(){const s=loadProfile();if(!s?.name)return;document.getElementById('jName').value=s.name;if(s.avatar)document.getElementById('jAvUrl').value=s.avatar;joinRoom();}
+function prevJAv(){const url=document.getElementById('jAvUrl').value.trim();const img=document.getElementById('jAvImg'),ico=document.getElementById('jAvIco');if(url){img.src=url;img.style.display='block';ico.style.display='none';}else{img.style.display='none';ico.style.display='';}}
+function joinRoom(){
+  const name=document.getElementById('jName').value.trim();
+  if(!name){showNotif('Ad girin');return;}
+  const avatar=document.getElementById('jAvUrl').value.trim();
+  me={username:name,tur:IS_ADMIN?'admin':'user',avatar,seat:0,voice:false,frame:selFrame};
+  saveProfile(name,avatar);
+  document.getElementById('joinScreen').classList.add('gone');
+  document.getElementById('app').style.display='flex';
+  setMyAv(avatar,name);
+  connectWS(name,me.tur,avatar);
+}
+
+/* ══ WS ══ */
+function connectWS(username,tur,avatar){
+  const proto=location.protocol==='https:'?'wss':'ws';
+  ws=new WebSocket(`${proto}://${location.host}`);
+  ws.onopen=()=>{
+    send({type:'join',username,tur,avatar,frame:selFrame,entranceId:selEntrance});
+    setInterval(()=>send({type:'ping'}),20000);
+    if(IS_ADMIN){
+      document.getElementById('adminBtn').style.display='';
+      document.getElementById('adminCtrl').classList.add('show');
+      document.getElementById('adminPlayPauseBtn').style.display='';
+      // Her saniye admin pozisyonunu server'a bildir
+      syncInterval=setInterval(()=>adminSendSync(),1000);
+    }
+  };
+  ws.onmessage=e=>{let d;try{d=JSON.parse(e.data);}catch{return;}handleMsg(d);};
+  ws.onclose=()=>{showNotif('Bağlantı kesildi...');setTimeout(()=>location.reload(),2500);};
+  ws.onerror=()=>{};
+}
+function send(data){if(ws&&ws.readyState===1)ws.send(JSON.stringify(data));}
+
+function handleMsg(d){
+  switch(d.type){
+    case 'init':
+      me.id=d.myId;
+      allItems=d.items||[];ownedItems=d.ownedItems||[];
+      d.chat.forEach(m=>renderMsg(m,false));
+      updateUsers(d.users);applyRoom(d.room);applyVideo(d.video,true);
+      renderFrameGrid();renderEntranceGrid();renderGiftGrid();renderAdminItems();
+      scrollChat();break;
+    case 'chat':renderMsg(d.msg);scrollChat();break;
+    case 'users':updateUsers(d.users);break;
+    case 'video_change':applyVideo(d.video,true);break;
+    case 'video_sync':
+      if(!IS_ADMIN) applySyncedVideo(d.video);
+      else updateAdminPlayPauseBtn(d.video?.playing);
+      break;
+    case 'room_settings':applyRoom(d.room);break;
+    case 'items_update':allItems=d.items||[];renderFrameGrid();renderEntranceGrid();renderGiftGrid();renderAdminItems();break;
+    case 'entrance':showEntrance(d);break;
+    case 'gift_fx':showGiftFx(d);break;
+    case 'chat_cleared':document.getElementById('chatBody').innerHTML='';showNotif('Sohbet temizlendi');break;
+    case 'voice_peer_joined':if(d.peerId!==me.id)createOffer(d.peerId);break;
+    case 'voice_peers_existing':d.peers.forEach(pid=>createOffer(pid));break;
+    case 'voice_peer_left':closePeer(d.peerId);break;
+    case 'webrtc_signal':handleSignal(d.from,d.signal);break;
+    case 'banned':document.body.innerHTML='<div style="height:100vh;display:flex;align-items:center;justify-content:center;font-family:sans-serif;color:#fc6b6b;font-size:18px;background:#0d0005;text-align:center"><div><div style="font-size:52px;margin-bottom:16px">🚫</div>Odadan atıldınız.</div></div>';break;
+  }
+}
+
+/* ══ FRAME ══ */
+function showFrameTab(id, btn){
+  document.getElementById('ftFrames').style.display='none';
+  document.getElementById('ftEntrance').style.display='none';
+  document.getElementById(id).style.display='';
+  document.querySelectorAll('#frameTabRow .tab-btn').forEach(b=>b.classList.remove('act'));
+  if(btn) btn.classList.add('act');
+}
+function getFrames(){return allItems.filter(it=>it.type==='frame');}
+function getEntrances(){return allItems.filter(it=>it.type==='entrance');}
+
+function renderFrameGrid(){
+  const grid=document.getElementById('frameGrid');grid.innerHTML='';
+  const none=document.createElement('div');none.className='frame-cell'+(selFrame===''?' sel':'');
+  none.innerHTML=`<div class="frame-preview"><div class="frame-none"><i class="fa-solid fa-xmark"></i></div></div><div class="frame-name">Çerçeve Yok</div>`;
+  none.onclick=()=>{selFrame='';send({type:'set_frame',frameId:''});updateMyFrame('');grid.querySelectorAll('.frame-cell').forEach(c=>c.classList.remove('sel'));none.classList.add('sel');};
+  grid.appendChild(none);
+  getFrames().forEach(f=>{
+    const c=document.createElement('div');c.className='frame-cell'+(selFrame===f.id?' sel':'');
+    const avHtml=me.avatar?`<img src="${esc(me.avatar)}" alt="" onerror="this.style.display='none'"/>`:`<span>${(me.username||'?').charAt(0).toUpperCase()}</span>`;
+    c.innerHTML=`<div class="frame-preview"><div class="frame-preview-av">${avHtml}</div><div class="frame-preview-img" style="background-image:url('${esc(f.url)}')"></div></div><div class="frame-name">${esc(f.name)}</div>`;
+    c.onclick=()=>{selFrame=f.id;send({type:'set_frame',frameId:f.id});updateMyFrame(f.url);grid.querySelectorAll('.frame-cell').forEach(x=>x.classList.remove('sel'));c.classList.add('sel');};
+    grid.appendChild(c);
+  });
+}
+
+function renderEntranceGrid(){
+  const grid=document.getElementById('entranceGrid');if(!grid)return;grid.innerHTML='';
+  const noneC=document.createElement('div');noneC.className='frame-cell'+(selEntrance===''?' sel':'');
+  noneC.innerHTML=`<div class="frame-preview"><div class="frame-none"><i class="fa-solid fa-xmark"></i></div></div><div class="frame-name">Efekt Yok</div>`;
+  noneC.onclick=()=>{selEntrance='';grid.querySelectorAll('.frame-cell').forEach(c=>c.classList.remove('sel'));noneC.classList.add('sel');showNotif('Giriş efekti kaldırıldı');};
+  grid.appendChild(noneC);
+  getEntrances().forEach(f=>{
+    const c=document.createElement('div');c.className='frame-cell'+(selEntrance===f.id?' sel':'');
+    const thumb=f.url?`<img src="${esc(f.url)}" style="width:100%;height:100%;object-fit:cover;border-radius:6px" alt="" onerror="this.style.display='none'"/>`:'<i class="fa-solid fa-wand-sparkles" style="font-size:20px;color:var(--acc2)"></i>';
+    c.innerHTML=`<div class="frame-preview" style="background:rgba(255,255,255,.05);border-radius:8px">${thumb}</div><div class="frame-name">${esc(f.name)}</div>`;
+    c.onclick=()=>{selEntrance=f.id;grid.querySelectorAll('.frame-cell').forEach(x=>x.classList.remove('sel'));c.classList.add('sel');showNotif(`✨ ${f.name} seçildi`);};
+    grid.appendChild(c);
+  });
+}
+function updateMyFrame(url){
+  const ov=document.getElementById('myFrameOv');
+  if(url){ov.style.backgroundImage=`url('${url}')`;ov.style.display='block';}
+  else{ov.style.backgroundImage='';ov.style.display='none';}
+}
+
+/* ══ GIFT GRID ══ */
+function getGifts(){return allItems.filter(it=>it.type==='gift');}
+function renderGiftGrid(){
+  const gg=document.getElementById('giftGrid');gg.innerHTML='';
+  const gifts=getGifts();
+  if(!gifts.length){gg.innerHTML='<div style="color:rgba(255,255,255,.3);font-size:12px;font-family:\'Exo 2\';padding:10px;text-align:center">Henüz hediye yok</div>';return;}
+  gifts.forEach(g=>{
+    const d=document.createElement('div');d.className='gcell';
+    const ic=g.url?`<img src="${esc(g.url)}" alt="${esc(g.name)}" onerror="this.style.display='none';this.nextSibling.style.display='block'"/><span style="display:none;font-size:24px">${g.emoji||'🎁'}</span>`:`<span style="font-size:24px">${g.emoji||'🎁'}</span>`;
+    d.innerHTML=`<div class="gic">${ic}</div><div class="gnm">${esc(g.name)}</div>`;
+    d.onclick=()=>{selGift=g;gg.querySelectorAll('.gcell').forEach(x=>x.classList.remove('sel'));d.classList.add('sel');};
+    gg.appendChild(d);
+  });
+}
+
+/* ══ ADMIN: ITEM LIST ══ */
+function renderAdminItems(){
+  const frames=allItems.filter(it=>it.type==='frame'||it.type==='entrance');
+  const giftsAdm=allItems.filter(it=>it.type==='gift');
+  const al=document.getElementById('adminItemList');
+  const gl=document.getElementById('adminGiftList');
+  if(al){
+    al.innerHTML='';
+    frames.forEach(it=>{
+      const row=document.createElement('div');row.className='item-row';
+      const thumb=it.url?`<div class="item-thumb"><img src="${esc(it.url)}" alt="" onerror="this.style.display='none'"/></div>`:`<div class="item-thumb">${it.type==='frame'?'🖼️':'✨'}</div>`;
+      row.innerHTML=`${thumb}<div class="item-info"><div class="item-name">${esc(it.name)}</div><div class="item-type">${it.type==='frame'?'Çerçeve':'Giriş Efekti'}</div></div><button class="item-del" onclick="deleteItem('${it.id}')"><i class="fa-solid fa-trash"></i></button>`;
+      al.appendChild(row);
+    });
+    if(!frames.length)al.innerHTML='<div style="color:rgba(255,255,255,.3);font-size:12px;font-family:\'Exo 2\';padding:10px;text-align:center">Henüz öğe yok</div>';
+  }
+  if(gl){
+    gl.innerHTML='';
+    giftsAdm.forEach(it=>{
+      const row=document.createElement('div');row.className='item-row';
+      const thumb=it.url?`<div class="item-thumb"><img src="${esc(it.url)}" alt="" onerror="this.style.display='none'"/></div>`:`<div class="item-thumb">${it.emoji||'🎁'}</div>`;
+      row.innerHTML=`${thumb}<div class="item-info"><div class="item-name">${esc(it.name)}</div><div class="item-type">Hediye${it.effectUrl?' · Efektli':''}</div></div><button class="item-del" onclick="deleteItem('${it.id}')"><i class="fa-solid fa-trash"></i></button>`;
+      gl.appendChild(row);
+    });
+    if(!giftsAdm.length)gl.innerHTML='<div style="color:rgba(255,255,255,.3);font-size:12px;font-family:\'Exo 2\';padding:10px;text-align:center">Henüz hediye yok</div>';
+  }
+}
+
+/* ══ ADMIN ACTIONS ══ */
+function addItem(){
+  const name=document.getElementById('niName').value.trim();
+  const url=document.getElementById('niUrl').value.trim();
+  const itemType=document.getElementById('niType').value;
+  if(!name||!url){showNotif('İsim ve URL gerekli');return;}
+  send({type:'add_item',name,url,itemType});
+  document.getElementById('niName').value='';document.getElementById('niUrl').value='';
+  showNotif('Eklendi!');
+}
+function addGift(){
+  const name=document.getElementById('ngName').value.trim();
+  const url=document.getElementById('ngUrl').value.trim();
+  const effectUrl=document.getElementById('ngEffect').value.trim();
+  if(!name){showNotif('İsim gerekli');return;}
+  send({type:'add_gift',name,url,effectUrl,emoji:'🎁'});
+  document.getElementById('ngName').value='';document.getElementById('ngUrl').value='';document.getElementById('ngEffect').value='';
+  showNotif('Hediye eklendi!');
+}
+function deleteItem(id){if(!confirm('Silinsin mi?'))return;send({type:'delete_item',itemId:id});}
+function clearChat(){if(!confirm('Tüm sohbet silinsin mi?'))return;send({type:'clear_chat'});closeModal('adminModal');}
+function applyAdmin(){
+  const settings={name:document.getElementById('adName').value||'Maya Film',entrance_video:document.getElementById('adEntVid').value.trim(),entrance_effect:selEffect};
+  send({type:'room_settings',settings});closeModal('adminModal');showNotif('Ayarlar kaydedildi');
+}
+
+/* ══ GIFT SEND ══ */
+function sendGift(){
+  if(!selGift){showNotif('Hediye seç');return;}
+  const to=document.getElementById('giftTo').value;
+  if(!to){showNotif('Alıcı seç');return;}
+  send({type:'gift',to,giftId:selGift.id,name:selGift.name,emoji:selGift.emoji||'🎁'});
+  closeModal('giftModal');selGift=null;document.querySelectorAll('.gcell').forEach(c=>c.classList.remove('sel'));
+}
+
+/* ══ VIDEO ══ */
+const YT_API_KEY = 'AIzaSyDAtvqdnJ8j119YQ4t18x7NxNRc25zbUiM';
+let ytPlayer = null;          // YouTube IFrame API player instance
+let ytReady = false;          // API yüklendi mi
+let ytSyncTimer = null;       // Her 1sn admin sync timer
+
+/* Platformları tanı */
+function parseUrl(url){
+  url=(url||'').trim();
+  let m;
+  // YouTube
+  m=url.match(/(?:youtube\.com\/watch\?v=|youtu\.be\/|youtube\.com\/embed\/)([a-zA-Z0-9_-]{11})/);
+  if(m) return {type:'youtube', vid:m[1]};
+  // YouTube Playlist
+  m=url.match(/youtube\.com\/.*[?&]list=([a-zA-Z0-9_-]+)/);
+  if(m) return {type:'youtube_pl', vid:m[1]};
+  // Twitch channel
+  m=url.match(/twitch\.tv\/([a-zA-Z0-9_]+)(?:\/.*)?$/);
+  if(m) return {type:'twitch', vid:m[1]};
+  // Twitch VOD
+  m=url.match(/twitch\.tv\/videos\/(\d+)/);
+  if(m) return {type:'twitch_vod', vid:m[1]};
+  // Dailymotion
+  m=url.match(/dailymotion\.com\/video\/([a-z0-9]+)/i);
+  if(m) return {type:'dailymotion', vid:m[1]};
+  // Vimeo
+  m=url.match(/vimeo\.com\/(\d+)/);
+  if(m) return {type:'vimeo', vid:m[1]};
+  // OK.ru
+  m=url.match(/ok\.ru\/video\/(\d+)/);
+  if(m) return {type:'okru', vid:m[1]};
+  // Rutube
+  m=url.match(/rutube\.ru\/video\/([a-z0-9]+)/i);
+  if(m) return {type:'rutube', vid:m[1]};
+  // Kick
+  m=url.match(/kick\.com\/([a-zA-Z0-9_-]+)/);
+  if(m) return {type:'kick', vid:m[1]};
+  // MP4/WebM
+  if(/\.(mp4|webm|ogg|mov|m3u8)(\?|$)/i.test(url)) return {type:'mp4', vurl:url};
+  // HLS m3u8 with full URL
+  if(url.includes('.m3u8')) return {type:'mp4', vurl:url};
+  // Generic iframe fallback
+  if(url.startsWith('http')) return {type:'iframe', vurl:url};
+  return null;
+}
+
+/* Badge etiketleri */
+const PLATFORM_BADGES = {
+  youtube:['YT','vbyt'], youtube_pl:['YT▶','vbyt'],
+  twitch:['TWITCH','vbvio'], twitch_vod:['TWITCH','vbvio'],
+  dailymotion:['DM','vbok'], vimeo:['VIMEO','vbvio'],
+  okru:['OK','vbok'], rutube:['RT','vbrt'],
+  kick:['KICK','vbgrn'], mp4:['MP4','vbmp4'], iframe:['IFRAME','vbmp4']
+};
+
+function getPlatformLabel(type){ return PLATFORM_BADGES[type]?.[0] || type.toUpperCase(); }
+
+/* ── YouTube IFrame API ── */
+window.onYouTubeIframeAPIReady = function(){
+  ytReady = true;
+};
+// API scripti yükle
+(function(){
+  const s=document.createElement('script');s.src='https://www.youtube.com/iframe_api';document.head.appendChild(s);
+})();
+
+/* YT Player oluştur */
+function createYTPlayer(vid, seekTo=0, shouldPlay=true){
+  const wrap = document.getElementById('playerWrap');
+  // Eski player temizle
+  destroyActivePlayer();
+  wrap.innerHTML = '<button id="fsCloseBtn" onclick="toggleFullscreen()"><i class="fa-solid fa-compress"></i></button><div id="ytPlayerDiv"></div>';
+  document.getElementById('ytPlayerDiv').style.cssText='position:absolute;inset:0;width:100%;height:100%;z-index:1';
+
+  const startSeconds = Math.max(0, Math.floor(seekTo));
+
+  ytPlayer = new YT.Player('ytPlayerDiv', {
+    videoId: vid,
+    playerVars: {
+      autoplay: 1,
+      controls: IS_ADMIN ? 1 : 0,
+      modestbranding: 1,
+      rel: 0,
+      start: startSeconds,
+      enablejsapi: 1,
+      origin: location.origin
+    },
+    events: {
+      onReady: (e) => {
+        if(startSeconds > 0) e.target.seekTo(startSeconds, true);
+        if(shouldPlay) e.target.playVideo();
+        else e.target.pauseVideo();
+        activePlayer = { type:'youtube', el: e.target, isYT: true };
+        // Admin sync başlat
+        if(IS_ADMIN) startAdminSync();
+      },
+      onStateChange: (e) => {
+        // Admin: state değişince server'a bildir
+        if(IS_ADMIN){
+          const playing = e.data === YT.PlayerState.PLAYING;
+          const paused  = e.data === YT.PlayerState.PAUSED;
+          if(playing || paused){
+            const ct = ytPlayer.getCurrentTime ? ytPlayer.getCurrentTime() : 0;
+            send({type:'video_sync', currentTime:ct, playing});
+          }
+        }
+      }
+    }
+  });
+}
+
+/* Aktif player'ı yok et */
+function destroyActivePlayer(){
+  if(ytPlayer){ try{ytPlayer.destroy();}catch(e){} ytPlayer=null; }
+  stopAdminSync();
+  if(activePlayer){
+    try{
+      if(activePlayer.type==='video'){ activePlayer.el.pause(); activePlayer.el.src=''; }
+      else if(activePlayer.type==='iframe'){ activePlayer.el.src='about:blank'; }
+      if(activePlayer.el?.remove) activePlayer.el.remove();
+    }catch(e){}
+    activePlayer=null;
+  }
+}
+
+/* Admin sync — her saniye YT veya MP4 zamanını gönder */
+function startAdminSync(){
+  stopAdminSync();
+  ytSyncTimer = setInterval(()=>{
+    if(!IS_ADMIN || !videoState || videoState.type==='none') return;
+    let ct = 0, playing = false;
+    if(activePlayer?.isYT && ytPlayer){
+      try{ ct = ytPlayer.getCurrentTime()||0; playing = ytPlayer.getPlayerState()===YT.PlayerState.PLAYING; }catch(e){ return; }
+    } else if(activePlayer?.el?.tagName==='VIDEO'){
+      ct = activePlayer.el.currentTime||0;
+      playing = !activePlayer.el.paused;
+    } else return;
+    send({type:'video_sync', currentTime:ct, playing});
+  }, 1000);
+}
+function stopAdminSync(){ if(ytSyncTimer){ clearInterval(ytSyncTimer); ytSyncTimer=null; } }
+
+/* Admin play/pause */
+function adminTogglePlay(){
+  if(activePlayer?.isYT && ytPlayer){
+    try{
+      const state = ytPlayer.getPlayerState();
+      if(state===YT.PlayerState.PLAYING){ ytPlayer.pauseVideo(); send({type:'video_sync',currentTime:ytPlayer.getCurrentTime(),playing:false}); }
+      else{ ytPlayer.playVideo(); send({type:'video_sync',currentTime:ytPlayer.getCurrentTime(),playing:true}); }
+    }catch(e){}
+  } else if(activePlayer?.el?.tagName==='VIDEO'){
+    const el = activePlayer.el;
+    if(el.paused){ el.play(); send({type:'video_sync',currentTime:el.currentTime,playing:true}); }
+    else{ el.pause(); send({type:'video_sync',currentTime:el.currentTime,playing:false}); }
+  }
+}
+
+function updateAdminPlayPauseBtn(playing){
+  const ico=document.getElementById('adminPlayPauseIco');
+  if(ico) ico.className=playing?'fa-solid fa-pause':'fa-solid fa-play';
+}
+function getPlayerEl(){ return activePlayer?.el||null; }
+
+/* Kullanıcılara gelen senkron — 2sn+ fark varsa seek */
+function applySyncedVideo(v){
+  if(!v||v.type==='none') return;
+  videoState=v;
+  const serverNow = v.currentTime + (Date.now()-(v.serverAt||Date.now()))/1000;
+
+  if(activePlayer?.isYT && ytPlayer){
+    try{
+      const ct = ytPlayer.getCurrentTime()||0;
+      const diff = serverNow - ct;
+      if(Math.abs(diff)>2){ ytPlayer.seekTo(serverNow,true); showNotif(`⏱ +${diff.toFixed(1)}s`); }
+      if(v.playing && ytPlayer.getPlayerState()!==YT.PlayerState.PLAYING) ytPlayer.playVideo();
+      if(!v.playing && ytPlayer.getPlayerState()===YT.PlayerState.PLAYING) ytPlayer.pauseVideo();
+    }catch(e){}
+  } else if(activePlayer?.el?.tagName==='VIDEO'){
+    const el = activePlayer.el;
+    const diff = serverNow - el.currentTime;
+    if(Math.abs(diff)>2){ el.currentTime=serverNow; showNotif(`⏱ +${diff.toFixed(1)}s`); }
+    if(v.playing && el.paused) el.play().catch(()=>{});
+    if(!v.playing && !el.paused) el.pause();
+  }
+  updateAdminPlayPauseBtn(v.playing);
+}
+
+function submitVideo(){
+  const url=document.getElementById('vUrl').value.trim();
+  if(!url) return;
+  const p=parseUrl(url);
+  if(!p){ showNotif('Geçersiz URL'); return; }
+  const title = p.vid || url.split('/').pop().split('?')[0] || 'Video';
+  send({type:'video_change',vtype:p.type,vid:p.vid||'',vurl:p.vurl||url,title});
+  document.getElementById('vUrl').value='';
+  // Playlist: otomatik ekle
+  if(IS_ADMIN) plAddFromState({type:p.type,vid:p.vid||'',vurl:p.vurl||url,title});
+}
+function stopVideo(){ send({type:'video_change',vtype:'none',vid:'',vurl:'',title:'Yayın bekleniyor...'}); }
+function doSync(){ if(videoState) applyVideo(videoState,true); showNotif('Senkronize edildi'); }
+
+function applyVideo(v, seek=false){
+  if(!v) return;
+  videoState=v;
+  document.getElementById('vidTitle').textContent=v.title||'Video';
+  const badge=document.getElementById('vTypeBadge');
+  const bd=PLATFORM_BADGES[v.type];
+  if(v.type!=='none'&&bd){ badge.textContent=bd[0]; badge.className='vbadge '+bd[1]; badge.style.display=''; }
+  else badge.style.display='none';
+  setPlayer(v,seek);
+  updateAdminPlayPauseBtn(v.playing);
+}
+
+function setPlayer(v, seek=false){
+  destroyActivePlayer();
+  const wrap=document.getElementById('playerWrap');
+  wrap.innerHTML='<button id="fsCloseBtn" onclick="toggleFullscreen()"><i class="fa-solid fa-compress"></i></button><div id="placeholder"><div class="ph-ic"><i class="fa-solid fa-clapperboard"></i></div><div class="ph-t">Video bekleniyor...</div></div>';
+  if(!v||v.type==='none') return;
+
+  const seekSec = seek ? Math.max(0, v.currentTime + (Date.now()-(v.serverAt||Date.now()))/1000) : 0;
+
+  if(v.type==='youtube'||v.type==='youtube_pl'){
+    if(ytReady){
+      createYTPlayer(v.vid, seekSec, v.playing!==false);
+    } else {
+      // API henüz yüklenmediyse bekle
+      const waitYT = setInterval(()=>{
+        if(ytReady){ clearInterval(waitYT); createYTPlayer(v.vid, seekSec, v.playing!==false); }
+      },200);
+    }
+    return;
+  }
+
+  // İframe platformlar
+  let src='';
+  if(v.type==='okru') src=`https://ok.ru/videoembed/${v.vid}?autoplay=1`;
+  else if(v.type==='rutube') src=`https://rutube.ru/play/embed/${v.vid}?autoplay=1`;
+  else if(v.type==='dailymotion') src=`https://www.dailymotion.com/embed/video/${v.vid}?autoplay=1&mute=0`;
+  else if(v.type==='vimeo') src=`https://player.vimeo.com/video/${v.vid}?autoplay=1`;
+  else if(v.type==='twitch') src=`https://player.twitch.tv/?channel=${v.vid}&parent=${location.hostname}&autoplay=true`;
+  else if(v.type==='twitch_vod') src=`https://player.twitch.tv/?video=${v.vid}&parent=${location.hostname}&autoplay=true`;
+  else if(v.type==='kick') src=`https://player.kick.com/${v.vid}`;
+  else if(v.type==='iframe') src=v.vurl;
+
+  if(src){
+    const el=document.createElement('iframe');
+    el.src=src; el.allow='autoplay;encrypted-media;fullscreen'; el.allowFullscreen=true;
+    el.style.cssText='position:absolute;inset:0;width:100%;height:100%;border:0;z-index:1;';
+    wrap.innerHTML='<button id="fsCloseBtn" onclick="toggleFullscreen()"><i class="fa-solid fa-compress"></i></button>';
+    wrap.appendChild(el);
+    activePlayer={type:'iframe',el};
+    if(IS_ADMIN) startAdminSync();
+    return;
+  }
+
+  if(v.type==='mp4'){
+    const el=document.createElement('video');
+    el.src=v.vurl; el.controls=IS_ADMIN; el.autoplay=true; el.playsInline=true;
+    el.onloadedmetadata=()=>{
+      if(seek && seekSec>1) el.currentTime=seekSec;
+      if(v.playing!==false) el.play().catch(()=>{});
+      else el.pause();
+    };
+    el.style.cssText='position:absolute;inset:0;width:100%;height:100%;border:0;z-index:1;object-fit:contain;background:#000';
+    wrap.innerHTML='<button id="fsCloseBtn" onclick="toggleFullscreen()"><i class="fa-solid fa-compress"></i></button>';
+    wrap.appendChild(el);
+    activePlayer={type:'video',el};
+    if(IS_ADMIN) startAdminSync();
+  }
+}
+
+/* ══ YOUTUBE SEARCH ══ */
+async function ytSearch(){
+  const q=document.getElementById('ytSearchQ').value.trim();
+  if(!q) return;
+  const res=document.getElementById('ytSearchResults');
+  res.innerHTML='<div style="text-align:center;padding:20px;color:rgba(255,255,255,.4);font-family:\'Exo 2\'"><i class="fa-solid fa-spinner fa-spin"></i> Aranıyor...</div>';
+  try{
+    const r=await fetch(`https://www.googleapis.com/youtube/v3/search?part=snippet&q=${encodeURIComponent(q)}&type=video&maxResults=10&key=${YT_API_KEY}`);
+    const data=await r.json();
+    if(!data.items||!data.items.length){ res.innerHTML='<div style="text-align:center;padding:16px;color:rgba(255,255,255,.3);font-family:\'Exo 2\'">Sonuç bulunamadı</div>'; return; }
+    res.innerHTML='';
+    data.items.forEach(item=>{
+      const vid=item.id.videoId;
+      const title=item.snippet.title;
+      const channel=item.snippet.channelTitle;
+      const thumb=item.snippet.thumbnails?.medium?.url||item.snippet.thumbnails?.default?.url||'';
+      const d=document.createElement('div'); d.className='yt-result';
+      d.innerHTML=`<img class="yt-thumb" src="${esc(thumb)}" alt=""/><div class="yt-info"><div class="yt-title">${esc(title)}</div><div class="yt-ch">${esc(channel)}</div></div><button class="yt-add" onclick="ytPlayNow('${esc(vid)}','${esc(title).replace(/'/g,'\\\'')}')" title="Şimdi Oynat"><i class="fa-solid fa-play"></i></button>`;
+      res.appendChild(d);
+    });
+  }catch(e){ res.innerHTML=`<div style="text-align:center;padding:16px;color:#fc6b6b;font-family:'Exo 2'">Hata: ${e.message}</div>`; }
+}
+function ytPlayNow(vid, title){
+  send({type:'video_change',vtype:'youtube',vid,vurl:'',title});
+  plAddFromState({type:'youtube',vid,vurl:'',title});
+  closeModal('searchModal');
+  showNotif('▶ '+title.slice(0,30));
+}
+
+/* ══ PLAYLIST ══ */
+let playlist=[]; // [{type,vid,vurl,title}]
+let plCurrent=-1;
+
+function plAdd(){
+  const url=document.getElementById('plUrl').value.trim();
+  const titleInput=document.getElementById('plTitle').value.trim();
+  if(!url) return;
+  const p=parseUrl(url);
+  if(!p){ showNotif('Geçersiz URL'); return; }
+  const title=titleInput||p.vid||url.split('/').pop().split('?')[0]||'Video';
+  plAddFromState({type:p.type,vid:p.vid||'',vurl:p.vurl||url,title});
+  document.getElementById('plUrl').value='';
+  document.getElementById('plTitle').value='';
+}
+function plAddFromState(item){
+  // Duplicate kontrolü
+  const exists=playlist.find(x=>x.vid&&x.vid===item.vid && x.vurl===item.vurl);
+  if(exists) return;
+  playlist.push({...item});
+  renderPlaylist();
+}
+function plRemove(i){ playlist.splice(i,1); if(plCurrent>=playlist.length) plCurrent=playlist.length-1; renderPlaylist(); }
+function plPlayItem(i){
+  if(!IS_ADMIN) return;
+  plCurrent=i;
+  const item=playlist[i];
+  if(!item) return;
+  send({type:'video_change',vtype:item.type,vid:item.vid||'',vurl:item.vurl||'',title:item.title});
+  renderPlaylist();
+  showNotif('▶ '+item.title.slice(0,30));
+}
+function plNext(){
+  if(!playlist.length) return;
+  plCurrent=(plCurrent+1)%playlist.length;
+  plPlayItem(plCurrent);
+}
+function renderPlaylist(){
+  const el=document.getElementById('plList');
+  if(!el) return;
+  el.innerHTML='';
+  if(!playlist.length){ el.innerHTML='<div style="text-align:center;padding:16px;color:rgba(255,255,255,.3);font-family:\'Exo 2\'">Liste boş</div>'; }
+  playlist.forEach((item,i)=>{
+    const d=document.createElement('div');
+    d.className='pl-item'+(i===plCurrent?' pl-active':'');
+    const src=getPlatformLabel(item.type);
+    d.innerHTML=`<div class="pl-num">${i+1}</div><div class="pl-ttl">${esc(item.title)}</div><div class="pl-src">${src}</div>${IS_ADMIN?`<button class="pl-play" onclick="plPlayItem(${i})"><i class="fa-solid fa-play"></i></button><button class="pl-del" onclick="plRemove(${i})"><i class="fa-solid fa-xmark"></i></button>`:''}`;
+    el.appendChild(d);
+  });
+  // Now playing göster
+  const np=document.getElementById('plNowPlaying');
+  if(np){ if(plCurrent>=0&&playlist[plCurrent]){ np.style.display='block'; np.innerHTML=`<i class="fa-solid fa-music"></i> Şimdi: ${esc(playlist[plCurrent].title)}`; }else np.style.display='none'; }
+  const nb=document.getElementById('plNextBtn');
+  if(nb) nb.style.display=IS_ADMIN&&playlist.length>1?'':'none';
+}
+
+/* ══ FULLSCREEN ══ */
+function toggleFullscreen(){
+  const wrap=document.getElementById('playerWrap');
+  const ico=document.getElementById('fsIco');
+  fsMode=!fsMode;
+  if(fsMode){
+    wrap.classList.add('fs-mode');
+    if(ico) ico.className='fa-solid fa-compress';
+    // Native fullscreen dene (destekliyorsa)
+    if(wrap.requestFullscreen) wrap.requestFullscreen().catch(()=>{});
+    else if(wrap.webkitRequestFullscreen) wrap.webkitRequestFullscreen();
+  } else {
+    wrap.classList.remove('fs-mode');
+    if(ico) ico.className='fa-solid fa-expand';
+    if(document.exitFullscreen && document.fullscreenElement) document.exitFullscreen().catch(()=>{});
+    else if(document.webkitExitFullscreen) document.webkitExitFullscreen();
+  }
+}
+// Native fullscreen çıkışı yakalamak için
+document.addEventListener('fullscreenchange',()=>{if(!document.fullscreenElement&&fsMode){fsMode=false;document.getElementById('playerWrap').classList.remove('fs-mode');const ico=document.getElementById('fsIco');if(ico)ico.className='fa-solid fa-expand';}});
+document.addEventListener('webkitfullscreenchange',()=>{if(!document.webkitFullscreenElement&&fsMode){fsMode=false;document.getElementById('playerWrap').classList.remove('fs-mode');const ico=document.getElementById('fsIco');if(ico)ico.className='fa-solid fa-expand';}});
+
+/* ══ USERS ══ */
+function updateUsers(list){
+  users=list;
+  document.getElementById('hCnt').textContent=list.length;
+  const myU=list.find(u=>u.id===me.id);
+  if(myU){me.seat=myU.seat;me.voice=myU.voice;}
+  renderSeats(list);updateMicBtn();
+  const gt=document.getElementById('giftTo');gt.innerHTML='';
+  list.filter(u=>u.id!==me.id).forEach(u=>{const o=document.createElement('option');o.value=u.username;o.textContent=u.username;gt.appendChild(o);});
+  const uc=document.getElementById('userCards');uc.innerHTML='';
+  list.forEach(u=>{
+    const d=document.createElement('div');
+    d.className='ucard'+(u.tur==='admin'?' ac':u.tur==='vip'?' vc':'');
+    const av=u.avatar?`<div class="uc-av"><img src="${esc(u.avatar)}" alt="" onerror="this.style.display='none'"/></div>`:`<div class="uc-av">${esc(u.username.charAt(0).toUpperCase())}</div>`;
+    const ri=u.tur==='admin'?'<i class="fa-solid fa-crown" style="color:var(--gold);font-size:9px"></i>':u.tur==='vip'?'<i class="fa-solid fa-star" style="color:var(--vio);font-size:9px"></i>':'';
+    const acts=IS_ADMIN&&u.id!==me.id?`<div class="uc-acts"><button class="ua" onclick="event.stopPropagation();send({type:'mute_user',username:'${esc(u.username)}'})" title="${u.muted?'Ses aç':'Sustur'}"><i class="fa-solid ${u.muted?'fa-volume-high':'fa-volume-xmark'}"></i></button><button class="ua d" onclick="event.stopPropagation();if(confirm('${esc(u.username)} atılsın?'))send({type:'kick_user',username:'${esc(u.username)}'})" title="At"><i class="fa-solid fa-ban"></i></button></div>`:'';
+    d.innerHTML=`${av}<div class="uc-info"><div class="uc-name">${ri} ${esc(u.username)}</div><div class="uc-meta"><span class="lb">Lv${u.lvl||1}</span>${u.seat?`<span><i class="fa-solid fa-couch"></i> ${u.seat}</span>`:''}${u.voice?'<span style="color:#4ade80"><i class="fa-solid fa-microphone"></i></span>':''}${u.muted?'<span style="color:#fc6b6b"><i class="fa-solid fa-volume-xmark"></i></span>':''}</div></div>${acts}`;
+    uc.appendChild(d);
+  });
+  document.getElementById('voiceLbl').innerHTML=list.filter(u=>u.voice).length>0?`<i class="fa-solid fa-microphone"></i> ${list.filter(u=>u.voice).length} sesli`:'';
+}
+
+function renderSeats(list){
+  for(let i=1;i<=9;i++){
+    const sel=document.getElementById('seat'+i);if(!sel)continue;
+    const occ=list.find(u=>u.seat===i);
+    sel.classList.remove('occ','mine','voice');
+    const savImg=document.getElementById('savImg'+i);
+    const savInit=document.getElementById('savInit'+i);
+    const sun=document.getElementById('sun'+i);
+    const savFrame=document.getElementById('savFrame'+i);
+    if(occ){
+      sel.classList.add('occ');if(occ.id===me.id)sel.classList.add('mine');if(occ.voice)sel.classList.add('voice');
+      if(occ.avatar){savImg.src=occ.avatar;savImg.style.display='block';savInit.style.display='none';}
+      else{savImg.style.display='none';savInit.style.display='';savInit.textContent=occ.username.charAt(0).toUpperCase();}
+      sun.textContent=occ.username;
+      // Çerçeve
+      if(occ.frame){const f=allItems.find(it=>it.id===occ.frame);if(f){savFrame.style.backgroundImage=`url('${f.url}')`;savFrame.style.display='block';}else{savFrame.style.display='none';}}
+      else{savFrame.style.display='none';}
+    }else{
+      if(savImg){savImg.src='';savImg.style.display='none';}
+      if(savInit)savInit.textContent='';if(sun)sun.textContent='';
+      if(savFrame)savFrame.style.display='none';
+    }
+  }
+}
+
+function applyRoom(r){
+  if(!r)return;roomSettings=r;
+  document.getElementById('hRoomName').textContent=r.name||'Maya Film';
+  document.title=r.name||'Maya Film';
+  document.getElementById('adName').value=r.name||'';
+  document.getElementById('adEntVid').value=r.entrance_video||'';
+  selEffect=r.entrance_effect||'royal';
+  document.querySelectorAll('.echip').forEach(c=>{const ef=EFFECTS.find(e=>e.id===selEffect);c.classList.toggle('sel',!!ef&&c.textContent===ef.label);});
+}
+
+/* ══ CHAT ══ */
+function sendChat(){const mi=document.getElementById('msgIn');const t=mi.value.trim();if(!t)return;send({type:'chat',text:t});mi.value='';mi.style.height='';}
+function qi(e){const mi=document.getElementById('msgIn');mi.value+=e;mi.focus();}
+function getFrameUrl(frameId){if(!frameId)return'';const f=allItems.find(it=>it.id===frameId);return f?f.url:'';}
+function renderMsg(m,anim=true){
+  const body=document.getElementById('chatBody');
+  const d=document.createElement('div');
+  const isMine=m.username===me.username;
+  if(m.msgType==='system'||m.msgType==='gift'){
+    d.className=`cmsg ${m.msgType==='gift'?'gift':'sys'}`;d.textContent=m.text;
+  }else{
+    d.className=`cmsg ${isMine?'me':'norm'}`;
+    const rc=m.tur==='admin'?'wa':m.tur==='vip'?'wv':'wu';
+    const ri=m.tur==='admin'?'<i class="fa-solid fa-crown" style="color:var(--gold);font-size:8px"></i>':m.tur==='vip'?'<i class="fa-solid fa-star" style="color:var(--vio);font-size:8px"></i>':'';
+    const frameUrl=getFrameUrl(m.frame||'');
+    const frameEl=frameUrl?`<div class="cav-frame" style="background-image:url('${frameUrl}')"></div>`:'';
+    const av=m.avatar
+      ?`<div class="cav-wrap"><div class="cav"><img src="${esc(m.avatar)}" alt="" onerror="this.style.display='none'"/></div>${frameEl}</div>`
+      :`<div class="cav-wrap"><div class="cav">${esc(m.username.charAt(0).toUpperCase())}</div>${frameEl}</div>`;
+    d.innerHTML=`<div class="ctop">${av}<span class="cwho ${rc}">${ri} ${esc(m.username)}</span></div><div class="ctxt">${esc(m.text)}</div>`;
+  }
+  if(!anim)d.style.animation='none';
+  body.appendChild(d);
+  if(body.children.length>200)body.removeChild(body.firstChild);
+}
+function scrollChat(){const b=document.getElementById('chatBody');b.scrollTop=b.scrollHeight;}
+
+/* ══ ENTRANCE FX ══ */
+function playEntranceMedia(url, username){
+  const ov=document.getElementById('entVidOv');
+  const vid=document.getElementById('entVidEl'),img=document.getElementById('entImgEl');
+  document.getElementById('entVidName').textContent=`${username} odaya katıldı!`;
+  const isVid=/\.(mp4|webm|ogg)(\?|$)/i.test(url);
+  if(isVid){vid.src=url;vid.style.display='block';img.style.display='none';ov.classList.add('show');vid.play().catch(()=>{});const done=()=>{ov.classList.remove('show');vid.src='';vid.pause();img.src='';};vid.onended=done;setTimeout(done,14000);}
+  else{img.src=url;img.style.display='block';vid.style.display='none';ov.classList.add('show');setTimeout(()=>{ov.classList.remove('show');img.src='';},6000);}
+}
+
+function showEntrance(d){
+  // Kişiye özel giriş efekti (sunucu buldu)
+  if(d.personal_entrance?.url){ playEntranceMedia(d.personal_entrance.url, d.username); return; }
+  // Admin video
+  if(d.entrance_video&&d.entrance_video.trim()){ playEntranceMedia(d.entrance_video, d.username); return; }
+  // Sparkle + popup
+  const ov=document.getElementById('fxOv');
+  const chars=['★','◆','▲','✦','●','🎬','🍿'];
+  for(let i=0;i<20;i++){
+    const s=document.createElement('div');s.className='sparkle';
+    s.textContent=chars[Math.floor(Math.random()*chars.length)];
+    s.style.cssText=`left:${Math.random()*100}%;top:${Math.random()*100}%;animation-delay:${Math.random()*.9}s;font-size:${9+Math.random()*12}px;color:rgba(230,57,80,${.4+Math.random()*.5})`;
+    ov.appendChild(s);setTimeout(()=>{try{ov.removeChild(s);}catch(e){}},2600);
+  }
+  const ico=d.tur==='admin'?'fa-crown':d.tur==='vip'?'fa-star':'fa-user';
+  const icoc=d.tur==='admin'?'var(--gold)':d.tur==='vip'?'var(--vio)':'rgba(255,255,255,.5)';
+  const el=document.createElement('div');el.className='ent-fx';
+  el.innerHTML=`<i class="fa-solid ${ico} ent-ic" style="color:${icoc}"></i><div class="ent-name">${esc(d.username)}</div><div class="ent-sub">odaya katıldı</div>`;
+  ov.appendChild(el);setTimeout(()=>{try{ov.removeChild(el);}catch(e){}},5200);
+}
+
+/* ══ GIFT FX ══ */
+let giftFxTimer=null;
+function showGiftFx(d){
+  if(giftFxTimer){clearTimeout(giftFxTimer);resetGiftFx();}
+  const fxOv=document.getElementById('giftFxOv');
+  const vid=document.getElementById('giftFxVid'),imgEl=document.getElementById('giftFxImg');
+  const info=document.getElementById('giftFxInfo');
+  // Efekt medyası
+  if(d.effectUrl){
+    if(/\.(mp4|webm|ogg)(\?|$)/i.test(d.effectUrl)){
+      vid.src=d.effectUrl;vid.classList.add('show');imgEl.classList.remove('show');
+      vid.play().catch(()=>{});
+    }else{
+      imgEl.src=d.effectUrl;imgEl.classList.add('show');vid.classList.remove('show');
+    }
+  }
+  info.innerHTML=`<div class="gift-big">${d.emoji||'🎁'}</div><div class="gift-lbl">${esc(d.from)} → ${esc(d.to)}: ${esc(d.name)}</div>`;
+  info.style.display='block';
+  giftFxTimer=setTimeout(()=>{resetGiftFx();},4200);
+}
+function resetGiftFx(){
+  const vid=document.getElementById('giftFxVid'),imgEl=document.getElementById('giftFxImg'),info=document.getElementById('giftFxInfo');
+  vid.classList.remove('show');imgEl.classList.remove('show');info.style.display='none';
+  vid.src='';vid.pause();imgEl.src='';giftFxTimer=null;
+}
+
+/* ══ SEAT + VOICE ══ */
+async function clickSeat(n){
+  const occ=users.find(u=>u.seat===n);
+  if(occ&&occ.id!==me.id){showNotif('Bu koltuk dolu');return;}
+  if(me.seat===n){send({type:'take_seat',seat:n});me.seat=0;await disableVoice();}
+  else{send({type:'take_seat',seat:n});me.seat=n;showNotif(`Koltuk ${n} alındı`);}
+}
+async function toggleMic(){
+  if(!me.seat){showNotif('Önce bir koltuğa oturun');return;}
+  if(!localStream){await enableVoice();}
+  else{micOn=!micOn;localStream.getAudioTracks().forEach(t=>{t.enabled=micOn;});updateMicBtn();showNotif(micOn?'Mikrofon açık':'Mikrofon kapalı');}
+}
+async function enableVoice(){
+  try{localStream=await navigator.mediaDevices.getUserMedia({audio:{echoCancellation:true,noiseSuppression:true,autoGainControl:true},video:false});micOn=true;send({type:'voice_join'});updateMicBtn();showNotif('Sesli sohbet aktif');}
+  catch(e){showNotif('Mikrofon erişimi reddedildi: '+e.message);micOn=false;localStream=null;updateMicBtn();}
+}
+async function disableVoice(){
+  if(localStream){localStream.getTracks().forEach(t=>t.stop());localStream=null;}
+  micOn=false;if(me.voice){send({type:'voice_leave'});me.voice=false;}
+  Object.keys(peers).forEach(id=>closePeer(id));updateMicBtn();
+}
+function updateMicBtn(){
+  const btn=document.getElementById('micBtn'),ico=btn.querySelector('i');
+  if(!me.seat){btn.className='ibtn dim';ico.className='fa-solid fa-microphone-slash';}
+  else if(micOn&&localStream){btn.className='ibtn on';ico.className='fa-solid fa-microphone';}
+  else{btn.className='ibtn';ico.className='fa-solid fa-microphone-slash';}
+}
+
+/* ══ WEBRTC ══ */
+async function createOffer(peerId){
+  if(peers[peerId])return;const pc=newPC(peerId);
+  try{const offer=await pc.createOffer({offerToReceiveAudio:true});await pc.setLocalDescription(offer);send({type:'webrtc_signal',to:peerId,signal:{offer:pc.localDescription}});}
+  catch(e){closePeer(peerId);}
+}
+async function handleSignal(from,sig){
+  if(sig.offer){if(peers[from])closePeer(from);const pc=newPC(from);try{await pc.setRemoteDescription(new RTCSessionDescription(sig.offer));const ans=await pc.createAnswer();await pc.setLocalDescription(ans);send({type:'webrtc_signal',to:from,signal:{answer:pc.localDescription}});}catch(e){closePeer(from);}}
+  else if(sig.answer){const pc=peers[from];if(pc&&pc.signalingState!=='stable'){try{await pc.setRemoteDescription(new RTCSessionDescription(sig.answer));}catch(e){}}}
+  else if(sig.candidate){const pc=peers[from];if(pc){try{await pc.addIceCandidate(new RTCIceCandidate(sig.candidate));}catch(e){}}}
+}
+function newPC(peerId){
+  const pc=new RTCPeerConnection({iceServers:ICE_SERVERS,iceCandidatePoolSize:10});peers[peerId]=pc;
+  if(localStream)localStream.getTracks().forEach(t=>pc.addTrack(t,localStream));
+  pc.ontrack=evt=>{if(evt.streams&&evt.streams[0])playRemote(peerId,evt.streams[0]);};
+  pc.onicecandidate=evt=>{if(evt.candidate)send({type:'webrtc_signal',to:peerId,signal:{candidate:evt.candidate}});};
+  pc.onconnectionstatechange=()=>{if(['failed','disconnected','closed'].includes(pc.connectionState))closePeer(peerId);};
+  pc.oniceconnectionstatechange=()=>{if(pc.iceConnectionState==='failed'){try{pc.restartIce();}catch(e){}}};
+  return pc;
+}
+function playRemote(peerId,stream){let a=document.getElementById('ra_'+peerId);if(!a){a=document.createElement('audio');a.id='ra_'+peerId;a.autoplay=true;a.style.display='none';document.body.appendChild(a);}a.srcObject=stream;a.play().catch(()=>{});}
+function closePeer(peerId){const pc=peers[peerId];if(pc){try{pc.close();}catch(e){}delete peers[peerId];}const a=document.getElementById('ra_'+peerId);if(a)a.remove();}
+
+/* ══ AVATAR ══ */
+function setMyAv(url,name){
+  const img=document.getElementById('myAvImg'),init=document.getElementById('myAvInit');
+  if(url){img.src=url;img.style.display='block';init.style.display='none';img.onerror=()=>{img.style.display='none';init.style.display='';init.textContent=name?name.charAt(0).toUpperCase():'?'};}
+  else{img.style.display='none';init.style.display='';init.textContent=name?name.charAt(0).toUpperCase():'?';}
+}
+function prevAv(){const url=document.getElementById('avInput').value.trim();const img=document.getElementById('avPrevImg'),ico=document.getElementById('avPrevIco');if(url){img.src=url;img.style.display='block';ico.style.display='none';img.onerror=()=>{img.style.display='none';ico.style.display='';};}else{img.style.display='none';ico.style.display='';}}
+function saveAvatar(){const url=document.getElementById('avInput').value.trim();me.avatar=url;send({type:'update_avatar',avatar:url});setMyAv(url,me.username);saveProfile(me.username,url);closeModal('avatarModal');showNotif('Profil resmi güncellendi');}
+
+/* ══ MODALS ══ */
+function openModal(id){
+  if(id==='avatarModal'){document.getElementById('avInput').value=me.avatar||'';prevAv();}
+  if(id==='frameModal'){renderFrameGrid();renderEntranceGrid();}
+  if(id==='adminModal'){renderAdminItems();}
+  if(id==='giftModal'){renderGiftGrid();}
+  document.getElementById(id).classList.add('open');
+}
+function closeModal(id){document.getElementById(id).classList.remove('open');}
+document.addEventListener('keydown',e=>{if(e.key==='Escape')document.querySelectorAll('.mover.open').forEach(m=>m.classList.remove('open'));});
+
+/* ══ NOTIF ══ */
+function showNotif(msg,dur=2600){const stack=document.getElementById('notifs');const n=document.createElement('div');n.className='notif';n.textContent=msg;stack.appendChild(n);setTimeout(()=>{n.classList.add('out');setTimeout(()=>{try{stack.removeChild(n);}catch(e){}},260);},dur);}
+
+/* ══ UTILS ══ */
+function esc(s){return String(s||'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');}
+function leaveRoom(){if(ws)ws.close();location.reload();}
+window.addEventListener('beforeunload',()=>{if(ws)ws.close();});
+</script>
+</body>
+</html>
