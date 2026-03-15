@@ -66,7 +66,7 @@ wss.on('connection', ws => {
   ws.wsId=uuid(); ws.alive=true;
   ws.on('pong',()=>{ ws.alive=true; });
 
-  ws.on('message', raw => {
+  ws.on('message', async raw => {
     let d; try{d=JSON.parse(raw);}catch{return;}
     switch(d.type){
 
@@ -75,21 +75,19 @@ wss.on('connection', ws => {
         if(!username) return;
         const prev=allUsers().find(u=>u.username===username);
         if(prev?.banned){ws.send(JSON.stringify({type:'banned'}));ws.close();return;}
-        // Avatar: gönderilen varsa kullan, yoksa Firebase'den yüklü kayıtlıyı al
+        // Avatar: gönderilen varsa kullan, yoksa Firebase'den kayıtlıyı al
         let finalAvatar = avatar;
         if(!finalAvatar || finalAvatar.length < 10){
           try{
-            const avR=await fetch(`https://prstars-fb9b5-default-rtdb.firebaseio.com/avatars/${encodeURIComponent(username)}.json`);
-            const avD=await avR.json();
-            if(avD && typeof avD==='string') finalAvatar=avD;
+            const avR = await fbGet(`avatars/${username}`);
+            if(avR && typeof avR === 'string') finalAvatar = avR;
           }catch(e){}
         }
         store.users[ws.wsId]={id:ws.wsId,username,tur:tur||'user',avatar:finalAvatar||'',seat:0,muted:false,banned:false,voice:false,exp:prev?.exp||0,lvl:prev?Math.floor((prev.exp||0)/20)+1:1,frame:d.frame||'',ownedItems:[]};
         const u=store.users[ws.wsId];
-        /* init — video state ile birlikte hesaplanmış currentTime gönder */
         ws.send(JSON.stringify({type:'init',myId:ws.wsId,video:videoState(),chat:store.chat.slice(-60),users:allUsers(),room:store.room,items:store.items,ownedItems:[]}));
         const personalEff=store.items.find(it=>it.type==='entrance'&&u.ownedItems.includes(it.id));
-        bcast({type:'entrance',username,tur:tur||'user',effect:tur==='admin'?store.room.entrance_effect:'normal',entrance_video:tur==='admin'?store.room.entrance_video:'',personal_entrance:personalEff||null,avatar},ws.wsId);
+        bcast({type:'entrance',username,tur:tur||'user',effect:tur==='admin'?store.room.entrance_effect:'normal',entrance_video:tur==='admin'?store.room.entrance_video:'',personal_entrance:personalEff||null,avatar:finalAvatar||''},ws.wsId);
         bcast({type:'chat',msg:sysMsg(`${username} odaya katildi`)});
         bcast({type:'users',users:allUsers()});
         break;
@@ -164,7 +162,9 @@ wss.on('connection', ws => {
 
       case 'update_avatar': {
         const u=store.users[ws.wsId];if(!u) return;
-        u.avatar=(d.avatar||'').slice(0,500);bcast({type:'users',users:allUsers()}); break;
+        u.avatar=(d.avatar||'').slice(0,500000);
+        if(d.avatar) fbSet(`avatars/${u.username}`,d.avatar).catch(()=>{});
+        bcast({type:'users',users:allUsers()}); break;
       }
 
       case 'room_settings': {
