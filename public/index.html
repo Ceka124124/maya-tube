@@ -1330,7 +1330,7 @@ function joinRoom(){
 
 /* ══ WS ══ */
 function connectWS(username,tur,avatar){
-  ws=new WebSocket('wss://maya-tube.onrender.com');
+  ws=new WebSocket('wss://maya-tube-p4jg.onrender.com');
   ws.onopen=()=>{
     send({type:'join',username,tur,avatar,frame:selFrame,entranceId:selEntrance});
     setInterval(()=>send({type:'ping'}),20000);
