@@ -3224,7 +3224,7 @@ async function uploadAvatar(file, progressCb){
         const base64 = canvas.toDataURL('image/jpeg', 0.88).split(',')[1];
         // imgbb'ye yükle
         const form = new FormData();
-        form.append('key', '4910fe022e0b13d10b1beb0548459d8f');
+        form.append('key', '70194324f417ada12ea9215fe1985101');
         form.append('image', base64);
         const xhr = new XMLHttpRequest();
         xhr.open('POST', 'https://api.imgbb.com/1/upload');
