@@ -253,9 +253,9 @@ button{border:none;cursor:pointer;-webkit-appearance:none;font-family:inherit;co
 #seatRow{display:grid;grid-template-columns:repeat(6,1fr);gap:6px;padding:0;overflow:visible}
 .seat{cursor:pointer;position:relative;display:flex;flex-direction:column;align-items:center;padding-top:28px;user-select:none;-webkit-user-select:none;touch-action:manipulation}
 .seat:active .seat-img{transform:scale(.93);filter:brightness(1.4) saturate(1.3)!important;opacity:1!important}
-.seat-av{position:absolute;top:0;left:50%;transform:translateX(-50%);width:40px;height:40px;border-radius:50%;overflow:visible;background:transparent;border:none;display:none;align-items:center;justify-content:center;font-size:11px;font-weight:700;color:#fff;font-family:'Exo 2';z-index:3}
+.seat-av{position:absolute;top:-18px;left:50%;transform:translateX(-50%);width:50px;height:50px;border-radius:50%;overflow:visible;background:transparent;border:none;display:none;align-items:center;justify-content:center;font-size:11px;font-weight:700;color:#fff;font-family:'Exo 2';z-index:6}
 .seat-av img{width:100%;height:100%;object-fit:cover;display:none;border-radius:50%}
-.seat-av-inner{width:100%;height:100%;border-radius:50%;overflow:hidden;display:flex;align-items:center;justify-content:center;font-size:11px;font-weight:700;color:var(--txt);border:2px solid var(--brd);box-shadow:0 2px 10px var(--shadow2);background:var(--surf2)}
+.seat-av-inner{width:100%;height:100%;border-radius:50%;overflow:hidden;display:flex;align-items:center;justify-content:center;font-size:13px;font-weight:700;color:#fff;border:3px solid #fff;box-shadow:0 4px 16px rgba(0,0,0,.3);background:linear-gradient(135deg,#e63950,#f05068)}
 .seat-frame{position:absolute;top:50%;left:50%;transform:translate(-50%,-50%);width:64px;height:64px;pointer-events:none;z-index:4;background-size:100% 100%;background-repeat:no-repeat;background-position:center}
 .seat-mic{position:absolute;top:-4px;right:0;font-size:7px;color:#4ade80;display:none;z-index:5;background:rgba(0,0,0,.7);border-radius:50%;width:16px;height:16px;align-items:center;justify-content:center}
 .seat-mic i{animation:mw 1.4s ease-in-out infinite}
@@ -276,7 +276,7 @@ button{border:none;cursor:pointer;-webkit-appearance:none;font-family:inherit;co
 #chatPane{flex:1;display:flex;flex-direction:column;overflow:hidden;min-height:0;background:var(--chat-bg);contain:layout}
 #userStrip{display:none!important}
 #chatBody{flex:1;overflow-y:auto;padding:8px 6px;display:flex;flex-direction:column;gap:4px;-webkit-overflow-scrolling:touch;scrollbar-width:thin;scrollbar-color:rgba(200,210,240,.5) transparent;contain:content;will-change:scroll-position}
-.cmsg{padding:8px 12px;border-radius:12px;word-break:break-word;font-family:'Exo 2';font-size:15px;line-height:1.55;animation:mi .22s var(--r);-webkit-user-select:none;user-select:none}
+.cmsg{padding:8px 12px;border-radius:12px;word-break:break-word;font-family:'Exo 2';font-size:15px;line-height:1.55;animation:mi .22s var(--r);-webkit-user-select:none;user-select:none;contain:layout style paint}
 @keyframes mi{from{opacity:0;transform:translateY(4px)}}
 .cmsg.sys{background:rgba(200,210,240,.2);border:1px solid rgba(200,210,240,.35);color:rgba(80,80,140,.6);font-style:italic;font-size:10.5px;text-align:center}
 .cmsg.gift{background:rgba(245,158,11,.06);border:1px solid rgba(245,158,11,.2);text-align:center;color:#92400e}
@@ -546,7 +546,7 @@ select.mi option{background:var(--surf2);color:var(--inp-color)}
 @keyframes gifShimmer{0%,100%{background-position:200% 50%}50%{background-position:0% 50%}}
 .ep-load{text-align:center;padding:12px;color:rgba(100,100,160,.5);font-family:'Exo 2';font-size:11px;cursor:pointer;flex-shrink:0;display:none}
 .ep-load:hover{color:var(--acc2)}
-.ep-emoji-grid{display:grid;grid-template-columns:repeat(7,1fr);gap:2px;padding:8px;overflow-y:auto;flex:1}
+.ep-emoji-grid{display:grid;grid-template-columns:repeat(6,1fr);gap:6px;padding:12px;overflow-y:auto;flex:1;contain:layout style paint}
 .ep-empty{grid-column:1/-1;text-align:center;padding:30px 16px;color:var(--txt3);font-family:'Exo 2';font-size:12px;line-height:1.8;cursor:pointer}
 .ep-empty:hover{color:var(--acc2)}
 /* Chat GIF / Image mesajı */
@@ -1039,6 +1039,26 @@ body.dark .img-send-preview{background:rgba(6,182,212,.05);border-color:rgba(6,1
       <div class="mf">
         <label><i class="fa-solid fa-image"></i> KOLTUK İKON URL (opsiyonel)</label>
         <input class="mi" id="adSeatIcon" placeholder="https://... (koltuk üstüne gelir)"/>
+      </div>
+      <div class="mf">
+        <label><i class="fa-solid fa-palette"></i> YAZIM RENGİ</label>
+        <div style="display:flex;align-items:center;gap:10px">
+          <input type="color" id="adTextColor" value="#1a1a2e" style="width:44px;height:36px;border:none;border-radius:8px;cursor:pointer;background:none;padding:0"/>
+          <span style="font-family:'Exo 2';font-size:11px;color:rgba(255,255,255,.5)">Sohbet yazı rengi</span>
+        </div>
+      </div>
+      <div class="mf">
+        <label><i class="fa-solid fa-user"></i> AD RENGİ</label>
+        <div style="display:flex;align-items:center;gap:10px">
+          <input type="color" id="adNameColor" value="#f59e0b" style="width:44px;height:36px;border:none;border-radius:8px;cursor:pointer;background:none;padding:0"/>
+          <span style="font-family:'Exo 2';font-size:11px;color:rgba(255,255,255,.5)">Koltuk adları (altın parıltılı)</span>
+        </div>
+      </div>
+      <div class="mf">
+        <label><i class="fa-solid fa-border-all"></i> ÇERÇEVE SEÇENEĞ</label>
+        <select class="mi" id="adFrameSelect">
+          <option value="">Varsayılan</option>
+        </select>
       </div>
       <div class="mf">
         <label><i class="fa-solid fa-panorama"></i> ARKA PLAN GÖRSELI (URL)</label>
@@ -1732,6 +1752,19 @@ function renderAdminItems(){
     });
     if(!giftsAdm.length)gl.innerHTML='<div style="color:rgba(255,255,255,.3);font-size:12px;font-family:\'Exo 2\';padding:10px;text-align:center">Henüz hediye yok</div>';
   }
+  
+  // Frame select'ini doldur
+  const frameSelect = document.getElementById('adFrameSelect');
+  if(frameSelect){
+    const framesToShow = allItems.filter(it=>it.type==='frame');
+    frameSelect.innerHTML = '<option value="">Varsayılan</option>';
+    framesToShow.forEach(f=>{
+      const opt = document.createElement('option');
+      opt.value = f.id;
+      opt.textContent = f.name;
+      frameSelect.appendChild(opt);
+    });
+  }
 }
 
 /* ══ ADMIN ACTIONS ══ */
@@ -1767,15 +1800,42 @@ function clearBg(){
   bg.style.backgroundImage='';bg.classList.remove('has-img');
 }
 function applyAdmin(){
+  const textColor = document.getElementById('adTextColor')?.value||'#1a1a2e';
+  const nameColor = document.getElementById('adNameColor')?.value||'#f59e0b';
+  const frameSelect = document.getElementById('adFrameSelect')?.value||'';
+  
   const settings={
     name: document.getElementById('adName').value||'Maya Film',
     entrance_video: document.getElementById('adEntVid').value.trim(),
     entrance_effect: selEffect,
     seatColor: document.getElementById('adSeatColor')?.value||'#c41230',
     seatIcon:  document.getElementById('adSeatIcon')?.value.trim()||'',
+    textColor: textColor,
+    nameColor: nameColor,
+    defaultFrame: frameSelect,
     bgUrl:     document.getElementById('adBgUrl')?.value.trim()||''
   };
-  send({type:'room_settings',settings});closeModal('adminModal');showNotif('Ayarlar kaydedildi');
+  send({type:'room_settings',settings});
+  applyRoomColors(textColor, nameColor);
+  closeModal('adminModal');showNotif('Ayarlar kaydedildi');
+}
+
+function applyRoomColors(textColor, nameColor){
+  // Yazım rengini uygula
+  document.documentElement.style.setProperty('--txt-main', textColor);
+  document.documentElement.style.setProperty('--inp-color', textColor);
+  
+  // Ad rengi altın parıltılı efektle
+  document.querySelectorAll('.seat-uname').forEach(el=>{
+    el.style.color = nameColor;
+    el.style.textShadow = '0 0 8px rgba(245,158,11,.6)';
+  });
+  
+  // Tüm username'lere parıltı ekle
+  document.querySelectorAll('.cmsg-me .cmsg-name, .cmsg-other .cmsg-name').forEach(el=>{
+    el.style.color = nameColor;
+    el.style.textShadow = '0 0 6px rgba(245,158,11,.5)';
+  });
 }
 
 /* ══ GIFT SEND ══ */
@@ -2364,13 +2424,35 @@ function applyRoom(r){
   if(r.pairs)  renderPairIcons(r.pairs);
 }
 function applySeatStyle(color, iconUrl){
-  // CSS değişkeni ile koltuk rengini güncelle
+  // Koltuk rengini özel CSS property ile ayarla
+  const hue = colorToHue(color);
   document.documentElement.style.setProperty('--seat-color', color);
-  // Koltuk ikonunu data attribute ile sat
   document.querySelectorAll('.seat-img').forEach(el=>{
-    if(iconUrl){el.style.backgroundImage=`url('${iconUrl}'), url('https://freesorgupanel.neocities.org/movie_seat.png')`;el.style.backgroundSize='40px 40px, contain';}
-    else{el.style.backgroundImage="url('https://freesorgupanel.neocities.org/movie_seat.png')";el.style.backgroundSize='contain';}
+    if(iconUrl){
+      el.style.backgroundImage=`url('${iconUrl}'), url('https://freesorgupanel.neocities.org/movie_seat.png')`;
+      el.style.backgroundSize='40px 40px, contain';
+    } else {
+      el.style.backgroundImage="url('https://freesorgupanel.neocities.org/movie_seat.png')";
+      el.style.backgroundSize='contain';
+      el.style.filter=`hue-rotate(${hue}deg)`;
+    }
   });
+}
+function colorToHue(hexColor){
+  // Hex rengini HSL'ye dönüştür ve hue çıkar
+  const hex = hexColor.replace('#','');
+  const r = parseInt(hex.substr(0,2),16)/255;
+  const g = parseInt(hex.substr(2,2),16)/255;
+  const b = parseInt(hex.substr(4,2),16)/255;
+  const max = Math.max(r,g,b), min = Math.min(r,g,b);
+  let h = 0;
+  if(max!==min){
+    const d = max-min;
+    if(max===r) h = ((g-b)/d + (g<b?6:0))/6;
+    else if(max===g) h = ((b-r)/d + 2)/6;
+    else h = ((r-g)/d + 4)/6;
+  }
+  return Math.round(h*360);
 }
 
 /* ══ CHAT ══ */
@@ -2711,8 +2793,8 @@ function showNotif(msg,dur=2600,cls=''){
 
 
 /* ══ GIF / EMOJI PANEL ══ */
-const KLIPY_KEY = 'djvSxrlprS7RNOP2vP9O9Pwqu1MUlfioHv7rYkDzvLKdtsZNZthyByDXlPy0G2lR';
-const KLIPY_BASE = 'https://api.klipy.com/api/v1/' + KLIPY_KEY;
+const GIPHY_KEY = 'zNsf5E7bIRr18bQflk2XIomzb38Lqs0K';
+const GIPHY_BASE = 'https://api.giphy.com/v1/gifs';
 let epTab='gif', gifQuery='', gifFilter='all', gifPos='', gifPage=1, gifLoading=false, gifContentType='gif';
 let gifLoadAbort=null; // AbortController for cancelling inflight requests
 let gifFavs=[];
@@ -2778,27 +2860,24 @@ function gifSearchDebounce(){
 }
 async function gifLoad(){
   if(gifLoading) return;
-  // Cancel any pending request
   if(gifLoadAbort){try{gifLoadAbort.abort();}catch(e){}}
   gifLoadAbort = (typeof AbortController!=='undefined') ? new AbortController() : null;
   gifLoading = true;
   const grid = document.getElementById('epGifGrid');
   if(!grid){ gifLoading=false; return; }
 
-  const typeMap = { gif:'gifs', sticker:'stickers', clip:'clips', meme:'static-memes', aiemoji:'emojis' };
-  const ct = typeMap[gifContentType] || 'gifs';
-  const customerId = (me&&me.username) ? me.username : ('guest_'+Math.random().toString(36).slice(2,8));
-  const page = gifPage || 1;
-
+  const offset = (gifPage - 1) * 20;
+  const limit = 20;
+  const rating = 'pg-13'; // GIPHY doesn't have 18+ ratings, using highest available
+  
   let url;
   if(gifQuery){
-    url = `${KLIPY_BASE}/${ct}/search?page=${page}&per_page=16&q=${encodeURIComponent(gifQuery)}&customer_id=${encodeURIComponent(customerId)}&content_filter=medium`;
+    url = `${GIPHY_BASE}/search?api_key=${GIPHY_KEY}&q=${encodeURIComponent(gifQuery)}&limit=${limit}&offset=${offset}&rating=${rating}`;
   } else {
-    url = `${KLIPY_BASE}/${ct}/trending?page=${page}&per_page=16&customer_id=${encodeURIComponent(customerId)}`;
+    url = `${GIPHY_BASE}/trending?api_key=${GIPHY_KEY}&limit=${limit}&offset=${offset}&rating=${rating}`;
   }
 
-  // Show skeleton loaders on first page
-  if(page===1 && !grid.children.length){
+  if(gifPage===1 && !grid.children.length){
     for(let i=0;i<8;i++){
       const sk=document.createElement('div');sk.className='ep-gif loading';sk.style.cssText='aspect-ratio:1;border-radius:10px';
       grid.appendChild(sk);
@@ -2810,81 +2889,64 @@ async function gifLoad(){
     const r = await fetch(url, fetchOpts);
     if(!r.ok) throw new Error('HTTP '+r.status);
     const json = await r.json();
-    // Clear skeletons if first page
-    if(page===1) grid.innerHTML='';
-    if(!json.result){ throw new Error(json.message||'API error'); }
+    if(gifPage===1) grid.innerHTML='';
 
-    const items = json.data?.data || [];
-    const hasNext = json.data?.has_next || false;
-    gifPage = page + 1;
+    const items = json.data || [];
+    gifPage++;
 
-    if(!items.length && page===1){
+    if(!items.length && gifPage===2){
       const emEl=document.createElement('div');emEl.className='ep-empty';
       emEl.innerHTML='Sonuç bulunamadı 🤔<br><small>Farklı arama deneyin</small>';
       grid.appendChild(emEl);
     }
 
     items.forEach(item => {
-      if(item.type === 'ad') return; // reklamları atla
-      const file = item.file || {};
-      // GIF/Sticker: file.gif veya file.webp (preview), file.gif (send)
-      // Clip: file.gif (preview), file.mp4 (send)
-      const previewUrl = file.webp || file.gif || file.mp4 || '';
-      const sendUrl    = file.gif || file.mp4 || file.webp || '';
-      if(!previewUrl && !sendUrl) return;
+      const images = item.images || {};
+      const sendUrl = images.original?.url || '';
+      if(!sendUrl) return;
 
-      const slug = item.slug || '';
       const isFav = gifFavs.some(f => f.url === sendUrl);
       const cell = document.createElement('div');
       cell.className = 'ep-gif loading' + (isFav ? ' fav-item' : '');
-      // Img elementini programatik oluştur — skeleton kaldır yüklenince
+      
       const imgEl = document.createElement('img');
-      imgEl.alt = item.title||'gif';
+      imgEl.alt = item.slug||'gif';
       imgEl.loading = 'lazy';
       imgEl.decoding = 'async';
       imgEl.style.cssText = 'width:100%;height:100%;object-fit:cover;display:block;opacity:0;transition:opacity .2s';
       imgEl.onload  = () => { cell.classList.remove('loading'); imgEl.style.opacity='1'; };
-      imgEl.onerror = () => { 
-        // Fallback: previewUrl başarısızsa sendUrl dene
-        if(imgEl.src !== sendUrl && sendUrl && sendUrl !== previewUrl){
-          imgEl.src = sendUrl;
-        } else {
-          cell.remove();
-        }
-      };
-      // IntersectionObserver ile lazy load — viewport'a girince yükle
+      imgEl.onerror = () => { cell.remove(); };
+      
       if('IntersectionObserver' in window){
         const gifObs = new IntersectionObserver((entries,obs)=>{
           if(!entries[0].isIntersecting)return;
           obs.disconnect();
-          imgEl.src = previewUrl || sendUrl;
+          imgEl.src = sendUrl;
         },{rootMargin:'150px'});
         gifObs.observe(cell);
       } else {
-        imgEl.src = previewUrl || sendUrl;
+        imgEl.src = sendUrl;
       }
+      
       const favBtn = document.createElement('button');
       favBtn.className = 'ep-gif-fav';
       favBtn.textContent = isFav ? '★' : '☆';
-      favBtn.onclick = (e) => { e.stopPropagation(); toggleFavGif(sendUrl, item.title||'', cell); };
+      favBtn.onclick = (e) => { e.stopPropagation(); toggleFavGif(sendUrl, item.slug||'', cell); };
       cell.appendChild(imgEl);
       cell.appendChild(favBtn);
       cell.onclick = () => {
-        sendGifMsg(sendUrl, item.title||'');
-        fetch(`${KLIPY_BASE}/${ct}/share/${slug}`,{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({customer_id:customerId,q:gifQuery||''})}).catch(()=>{});
+        sendGifMsg(sendUrl, item.slug||'');
       };
       grid.appendChild(cell);
-
     });
 
-    // Load more buton
     const loadBtn = document.getElementById('epGifLoad');
-    if(loadBtn) loadBtn.style.display = hasNext ? 'block' : 'none';
+    if(loadBtn) loadBtn.style.display = items.length >= limit ? 'block' : 'none';
 
   } catch(e) {
-    if(e.name==='AbortError') { gifLoading=false; return; } // cancelled
-    if(page===1) grid.innerHTML = `<div class="ep-empty"><i class="fa-solid fa-triangle-exclamation" style="color:#fc6b6b"></i><br>${e.message||'Bağlantı hatası'}<br><small style="font-size:10px;opacity:.6">Tekrar denemek için dokunun</small></div>`;
-    console.error('Klipy API error:', e);
+    if(e.name==='AbortError') { gifLoading=false; return; }
+    if(gifPage===1) grid.innerHTML = `<div class="ep-empty"><i class="fa-solid fa-triangle-exclamation" style="color:#fc6b6b"></i><br>${e.message||'Bağlantı hatası'}<br><small style="font-size:10px;opacity:.6">Tekrar denemek için dokunun</small></div>`;
+    console.error('Giphy API error:', e);
   }
   gifLoading = false;
 }
@@ -2914,8 +2976,10 @@ function renderEmojis(){
   const grid=document.getElementById('epEmojiGrid');if(!grid)return;grid.innerHTML='';
   EMOJIS.forEach(e=>{
     const cell=document.createElement('div');
-    cell.style.cssText='font-size:22px;text-align:center;cursor:pointer;padding:6px;border-radius:6px;transition:background .12s;line-height:1';
+    cell.style.cssText='font-size:36px;text-align:center;cursor:pointer;padding:8px;border-radius:8px;transition:background .12s;line-height:1;display:flex;align-items:center;justify-content:center;aspect-ratio:1';
     cell.textContent=e;
+    cell.onmouseover=()=>cell.style.background='rgba(100,120,200,.15)';
+    cell.onmouseout=()=>cell.style.background='';
     cell.onclick=()=>{ const mi=document.getElementById('msgIn');mi.value+=e;mi.focus(); };
     grid.appendChild(cell);
   });
