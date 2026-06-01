@@ -1,0 +1,629 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width,initial-scale=1.0,maximum-scale=1.0,user-scalable=no,viewport-fit=cover"/>
+<meta name="apple-mobile-web-app-capable" content="yes"/>
+<title>Maya Film</title>
+<link rel="preconnect" href="https://fonts.googleapis.com"/>
+<link href="https://fonts.googleapis.com/css2?family=Cinzel+Decorative:wght@700;900&family=Rajdhani:wght@400;600;700&family=Exo+2:wght@300;400;600;700&display=swap" rel="stylesheet"/>
+<link href="https://cdnjs.cloudflare.com/ajax/libs/remixicon/4.9.1/remixicon.min.css" rel="stylesheet"/>
+<style>
+:root{
+  --acc:#e63950;--acc2:#f05068;--rose:#e11d48;
+  --gold:#f59e0b;--cyan:#0891b2;--grn:#059669;--vio:#7c3aed;
+  --r:cubic-bezier(.16,1,.3,1);
+  --st:env(safe-area-inset-top,0px);--sb:env(safe-area-inset-bottom,0px);
+  --txt:#1a1a2e;--txt2:#4a5080;--txt3:#7a80a8;--mut:rgba(30,30,60,.45);
+  --brd:rgba(200,210,240,.45);--brd2:rgba(200,210,240,.25);
+  --surf:#ffffff;--surf2:#f0f4ff;--surf3:#e8eeff;
+  --glass:rgba(255,255,255,.75);--glass2:rgba(255,255,255,.55);
+  --shadow:rgba(100,120,200,.18);--shadow2:rgba(100,120,200,.10);
+  --bg1:#f0f4ff;--bg2:#e8eeff;
+  --hdr-bg:rgba(255,255,255,.88);--hdr-border:rgba(200,210,240,.5);
+  --card-bg:rgba(255,255,255,.97);--card-border:rgba(200,210,240,.6);
+  --inp-bg:rgba(240,244,255,.9);--inp-border:rgba(200,210,240,.6);
+  --inp-color:#1a1a3e;
+}
+body.dark{
+  --txt:#dde3ff;--txt2:#8890b8;--txt3:#5a6080;--mut:rgba(200,210,240,.2);
+  --brd:rgba(50,60,100,.5);--brd2:rgba(50,60,100,.3);
+  --surf:#0d0d20;--surf2:#13132a;--surf3:#181835;
+  --glass:rgba(13,13,32,.85);--glass2:rgba(13,13,32,.65);
+  --shadow:rgba(0,0,0,.5);--shadow2:rgba(0,0,0,.3);
+  --bg1:#060612;--bg2:#0a0a1a;
+  --hdr-bg:rgba(10,10,22,.92);--hdr-border:rgba(50,60,100,.5);
+  --card-bg:rgba(12,12,26,.98);--card-border:rgba(50,60,100,.5);
+  --inp-bg:rgba(18,18,36,.9);--inp-border:rgba(55,65,110,.6);
+  --inp-color:#dde3ff;
+}
+*,*::before,*::after{margin:0;padding:0;box-sizing:border-box;-webkit-tap-highlight-color:transparent}
+html,body{height:100%;overflow:hidden;overscroll-behavior:none}
+body{font-family:'Rajdhani',sans-serif;color:var(--txt);touch-action:manipulation;background:var(--bg2)}
+::-webkit-scrollbar{width:3px;height:3px}
+::-webkit-scrollbar-thumb{background:var(--acc2);border-radius:2px}
+input,textarea,select{outline:none;-webkit-appearance:none;font-family:inherit;color:var(--txt);background:none}
+button{border:none;cursor:pointer;-webkit-appearance:none;font-family:inherit;color:inherit;background:none}
+
+#bgFixed{position:fixed;inset:0;z-index:0;background:linear-gradient(135deg,var(--bg1) 0%,var(--bg2) 50%,var(--bg1) 100%);pointer-events:none}
+#bgFixed.has-img{background-size:cover;background-position:center;background-repeat:no-repeat}
+#bgFixed::after{content:'';position:absolute;inset:0;background:radial-gradient(ellipse at 20% 20%,rgba(230,57,80,.07) 0%,transparent 60%),radial-gradient(ellipse at 80% 80%,rgba(124,58,237,.06) 0%,transparent 60%),radial-gradient(ellipse at 50% 50%,rgba(255,255,255,.4) 0%,transparent 80%);pointer-events:none}
+
+/* LOADER */
+#loader{position:fixed;inset:0;z-index:900;background:var(--bg1);display:flex;flex-direction:column;align-items:center;justify-content:center;gap:18px;transition:opacity .5s,transform .5s}
+#loader.gone{opacity:0;transform:scale(1.04);pointer-events:none}
+.ld-logo{font-family:'Cinzel Decorative';font-size:clamp(20px,6vw,34px);background:linear-gradient(135deg,#e63950,#7c3aed,#e63950);-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;animation:shimmer 2s infinite;background-size:200%}
+@keyframes shimmer{0%,100%{background-position:0 50%}50%{background-position:100% 50%}}
+
+/* LOGIN SCREEN */
+#loginScreen{position:fixed;inset:0;z-index:500;display:flex;align-items:center;justify-content:center;padding:18px;background:transparent}
+#loginScreen.gone{opacity:0;transform:scale(1.05);pointer-events:none}
+.login-card{background:var(--card-bg);border:1px solid var(--card-border);border-radius:22px;padding:28px 22px;width:min(420px,100%);box-shadow:0 8px 40px var(--shadow);backdrop-filter:blur(20px);display:flex;flex-direction:column;gap:14px}
+.login-logo{font-family:'Cinzel Decorative';font-size:clamp(16px,5vw,26px);background:linear-gradient(135deg,#e63950,#7c3aed,#e63950);-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;text-align:center;animation:shimmer 3s infinite;background-size:200%}
+.login-field{display:flex;flex-direction:column;gap:5px}
+.login-field label{font-family:'Exo 2';font-size:9px;color:rgba(60,60,120,.7);font-weight:700;letter-spacing:.1em}
+.login-input{background:var(--inp-bg);border:1.5px solid var(--inp-border);border-radius:10px;padding:11px 13px;font-family:'Exo 2';font-size:14px;width:100%;color:var(--inp-color);transition:border-color .2s}
+.login-input:focus{border-color:var(--acc2);box-shadow:0 0 0 3px rgba(230,57,80,.12)}
+.login-btn{background:linear-gradient(135deg,#e63950,#f05068);border-radius:12px;padding:13px;color:#fff;font-family:'Cinzel Decorative';font-size:13px;transition:transform .15s,box-shadow .15s;box-shadow:0 4px 20px rgba(230,57,80,.35);width:100%;cursor:pointer}
+.login-btn:active{transform:scale(.97)}
+
+/* ROOM DISCOVERY */
+#roomDiscovery{position:fixed;inset:0;z-index:480;display:none;flex-direction:column;padding-top:var(--st);background:var(--bg2);overflow:hidden}
+#roomDiscovery.show{display:flex}
+.room-header{background:var(--hdr-bg);border-bottom:1px solid var(--hdr-border);padding:10px;display:flex;align-items:center;gap:10px}
+.room-header h2{font-family:'Cinzel Decorative';font-size:14px;background:linear-gradient(135deg,#e63950,#7c3aed);-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;flex:1}
+.room-create-btn{background:var(--acc);color:#fff;border-radius:8px;padding:8px 12px;font-size:12px;cursor:pointer}
+.rooms-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(140px,1fr));gap:12px;padding:12px;overflow-y:auto;flex:1}
+.room-card{background:var(--card-bg);border:1px solid var(--card-border);border-radius:12px;padding:12px;cursor:pointer;transition:all .2s;display:flex;flex-direction:column;gap:8px}
+.room-card:hover{border-color:var(--acc2);transform:translateY(-2px)}
+.room-image{width:100%;height:100px;background:linear-gradient(135deg,#e63950,#7c3aed);border-radius:8px;overflow:hidden;display:flex;align-items:center;justify-content:center;color:#fff;font-size:12px}
+.room-image img{width:100%;height:100%;object-fit:cover}
+.room-info{display:flex;flex-direction:column;gap:4px}
+.room-name{font-weight:700;font-size:11px;color:var(--txt)}
+.room-meta{font-size:9px;color:var(--txt2);display:flex;flex-direction:column;gap:2px}
+
+/* CREATE ROOM MODAL */
+.modal-overlay{position:fixed;inset:0;z-index:600;background:rgba(100,120,200,.3);backdrop-filter:blur(8px);display:none;align-items:center;justify-content:center;padding:20px}
+.modal-overlay.open{display:flex}
+.modal-box{background:var(--card-bg);border-radius:16px;padding:20px;width:min(400px,100%);box-shadow:0 12px 40px var(--shadow);display:flex;flex-direction:column;gap:12px}
+.modal-close{position:absolute;top:16px;right:16px;background:none;border:none;font-size:24px;cursor:pointer;color:var(--txt2)}
+
+/* MAIN APP */
+#app{position:fixed;inset:0;z-index:10;display:none;flex-direction:column;height:100dvh}
+#app.show{display:flex}
+
+/* HEADER */
+#hdr{flex-shrink:0;height:calc(44px + var(--st));padding-top:var(--st);background:var(--hdr-bg);border-bottom:1px solid var(--hdr-border);box-shadow:0 2px 16px var(--shadow2);backdrop-filter:blur(20px);display:flex;align-items:center;gap:6px;padding-inline:10px;position:relative;z-index:50}
+.hlogo{font-family:'Cinzel Decorative';font-size:12px;background:linear-gradient(135deg,#e63950,#7c3aed);-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;white-space:nowrap;flex-shrink:0}
+.hroom-name{font-family:'Exo 2';font-size:8px;color:var(--txt2);white-space:nowrap;flex:1;overflow:hidden;text-overflow:ellipsis;max-width:100px}
+.hsp{flex:1}
+.hlive{display:flex;align-items:center;gap:3px;background:rgba(225,29,72,.08);border:1px solid rgba(225,29,72,.25);border-radius:8px;padding:2px 6px;font-size:7px;color:#e63950;font-weight:700}
+.hbtn{background:var(--inp-bg);border:1px solid var(--brd);border-radius:8px;padding:4px 8px;font-size:11px;color:var(--txt2);transition:all .15s;flex-shrink:0;cursor:pointer}
+
+/* MAIN CONTENT */
+#main{flex:1;display:flex;flex-direction:column;overflow:hidden;min-height:0}
+@media(min-width:768px){#main{flex-direction:row} #videoPane{width:clamp(280px,50%,600px);flex-shrink:0;border-right:1px solid var(--brd)} #chatPane{flex:1;min-width:0}}
+
+/* VIDEO PANE */
+#videoPane{flex-shrink:0;display:flex;flex-direction:column;background:transparent}
+#playerWrap{height:clamp(150px,32vh,290px);position:relative;background:#0a0010;overflow:hidden;flex-shrink:0;box-shadow:0 4px 20px rgba(100,120,200,.12)}
+#playerWrap iframe,#playerWrap video{position:absolute;inset:0;width:100%;height:100%;border:0;z-index:1}
+#placeholder{position:absolute;inset:0;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:10px;background:linear-gradient(135deg,#0a0010,#1a0530);z-index:1;color:rgba(200,180,255,.35);text-align:center}
+#vidBar{flex-shrink:0;display:flex;align-items:center;gap:6px;padding:5px 10px;background:var(--hdr-bg);border-bottom:1px solid var(--brd);min-height:32px;box-shadow:0 1px 8px var(--shadow2)}
+#vidTitle{font-family:'Exo 2';font-size:10px;color:#4a5080;flex:1;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.vbadge{font-size:8px;font-weight:700;padding:2px 6px;border-radius:6px;font-family:'Exo 2';flex-shrink:0}
+.video-controls{display:flex;align-items:center;gap:6px}
+#vUrl{flex:1;min-width:0;font-family:'Exo 2';font-size:11px;background:rgba(240,244,255,.8);border:1px solid rgba(200,210,240,.6);border-radius:7px;padding:6px 8px;color:#1a1a3e}
+#vUrl:focus{border-color:var(--acc2);outline:none}
+.vcbtn{flex-shrink:0;background:var(--inp-bg);border:1px solid var(--brd);border-radius:7px;padding:6px 9px;font-size:12px;color:var(--txt2);transition:all .14s;cursor:pointer}
+
+/* SEATS */
+#seatsArea{flex-shrink:0;background:var(--inp-bg);border-bottom:1px solid var(--brd);padding:6px 8px 10px;backdrop-filter:blur(12px);max-height:100px;overflow-y:auto}
+#seatRow{display:grid;grid-template-columns:repeat(6,1fr);gap:6px;padding:0}
+.seat{cursor:pointer;position:relative;display:flex;flex-direction:column;align-items:center;gap:3px;padding:6px;border:2px solid var(--brd);border-radius:8px;background:var(--surf);transition:all .15s;font-size:10px}
+.seat:hover{border-color:var(--acc2)}
+.seat.occupied{opacity:.5;cursor:not-allowed}
+.seat-avatar{width:28px;height:28px;border-radius:50%;overflow:hidden;background:var(--inp-bg);display:flex;align-items:center;justify-content:center;font-size:8px;font-weight:700;border:2px solid var(--brd)}
+.seat-avatar img{width:100%;height:100%;object-fit:cover}
+.seat-label{font-family:'Exo 2';font-size:8px;color:var(--txt2);text-align:center}
+
+/* CHAT PANE */
+#chatPane{flex:1;display:flex;flex-direction:column;overflow:hidden;min-height:0;background:var(--bg2)}
+#chatMessages{flex:1;overflow-y:auto;padding:10px;display:flex;flex-direction:column;gap:8px}
+.chat-msg{display:flex;gap:8px;animation:fadeIn .3s}
+@keyframes fadeIn{from{opacity:0;transform:translateY(8px)}to{opacity:1;transform:translateY(0)}}
+.msg-avatar{width:32px;height:32px;border-radius:50%;overflow:hidden;background:var(--inp-bg);display:flex;align-items:center;justify-content:center;font-weight:700;font-size:10px;flex-shrink:0;border:1px solid var(--brd)}
+.msg-avatar img{width:100%;height:100%;object-fit:cover}
+.msg-content{flex:1}
+.msg-header{display:flex;align-items:center;gap:6px;font-size:11px;font-weight:700;color:var(--txt)}
+.msg-badge{font-size:8px;background:rgba(230,57,80,.1);color:var(--acc);padding:1px 4px;border-radius:4px}
+.msg-text{font-size:12px;color:var(--txt);line-height:1.4;margin-top:4px;word-break:break-word}
+.msg-time{font-size:8px;color:var(--txt3);margin-top:2px}
+
+#chatInput{flex-shrink:0;padding:10px;background:var(--hdr-bg);border-top:1px solid var(--brd);display:flex;gap:6px;align-items:flex-end}
+.chat-field{flex:1;display:flex;gap:6px}
+.msg-input{flex:1;background:var(--inp-bg);border:1px solid var(--inp-border);border-radius:8px;padding:10px;font-family:inherit;font-size:12px;color:var(--inp-color);resize:none;max-height:60px}
+.msg-input::placeholder{color:rgba(100,100,160,.4)}
+.msg-send-btn{background:var(--acc);color:#fff;border:none;border-radius:8px;padding:10px 16px;font-size:12px;cursor:pointer;flex-shrink:0}
+
+/* BOTTOM NAV */
+#bottomNav{position:fixed;bottom:0;left:0;right:0;height:calc(48px + var(--sb));padding-bottom:var(--sb);background:var(--hdr-bg);border-top:1px solid var(--hdr-border);display:flex;justify-content:space-around;align-items:center;z-index:100;backdrop-filter:blur(20px)}
+.nav-item{display:flex;flex-direction:column;align-items:center;gap:4px;cursor:pointer;padding:8px;flex:1;color:var(--txt2);transition:color .2s;font-size:10px}
+.nav-item.active{color:var(--acc);font-weight:700}
+.nav-item i{font-size:20px}
+
+/* SEARCH MOVIES */
+#searchPane{display:none;flex-direction:column;padding:12px;gap:10px;flex:1;overflow:hidden}
+#searchPane.show{display:flex}
+.search-bar{display:flex;gap:6px}
+.search-input{flex:1;background:var(--inp-bg);border:1px solid var(--inp-border);border-radius:8px;padding:8px 12px;font-size:12px;color:var(--inp-color)}
+.search-btn{background:var(--acc);color:#fff;border-radius:8px;padding:8px 12px;cursor:pointer;font-size:12px;font-weight:700}
+.search-results{flex:1;overflow-y:auto;display:grid;grid-template-columns:repeat(auto-fill,minmax(100px,1fr));gap:10px}
+.movie-card{cursor:pointer;transition:transform .2s;border-radius:8px;overflow:hidden;display:flex;flex-direction:column}
+.movie-poster{width:100%;height:120px;background:linear-gradient(135deg,#e63950,#7c3aed);display:flex;align-items:center;justify-content:center;color:#fff;font-size:10px;text-align:center;overflow:hidden}
+.movie-poster img{width:100%;height:100%;object-fit:cover}
+.movie-info{background:var(--card-bg);padding:8px;border:1px solid var(--card-border);font-size:9px;color:var(--txt);flex:1;display:flex;flex-direction:column;gap:4px}
+.movie-title{font-weight:700;overflow:hidden;text-overflow:ellipsis;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical}
+.movie-year{color:var(--txt2);font-size:8px}
+.movie-action{background:var(--acc);color:#fff;padding:4px;border-radius:4px;text-align:center;cursor:pointer;font-weight:700}
+
+/* PROFILE */
+#profilePane{display:none;padding:12px;overflow-y:auto;flex:1}
+#profilePane.show{display:block}
+.profile-card{background:var(--card-bg);border:1px solid var(--card-border);border-radius:12px;padding:16px;text-align:center;display:flex;flex-direction:column;gap:12px}
+.profile-avatar{width:80px;height:80px;border-radius:50%;background:var(--inp-bg);margin:0 auto;border:3px solid var(--brd);display:flex;align-items:center;justify-content:center;font-size:28px;font-weight:700}
+.profile-name{font-size:16px;font-weight:700;color:var(--txt)}
+.profile-logout{background:rgba(225,29,72,.08);color:#e63950;border:1px solid rgba(225,29,72,.25);padding:10px;border-radius:8px;cursor:pointer;font-weight:700;transition:all .2s}
+.profile-logout:hover{background:rgba(225,29,72,.15)}
+</style>
+</head>
+<body>
+<div id="bgFixed"></div>
+
+<!-- LOADER -->
+<div id="loader">
+  <div class="ld-logo">MAYA FILM</div>
+  <div style="width:200px;height:3px;background:rgba(100,100,200,.12);border-radius:2px;overflow:hidden">
+    <div style="height:100%;width:0;background:linear-gradient(90deg,#e63950,#7c3aed);animation:ldFill 1s infinite"></div>
+  </div>
+</div>
+<style>@keyframes ldFill{0%{width:0}50%{width:70%}100%{width:100%}}</style>
+
+<!-- LOGIN SCREEN -->
+<div id="loginScreen">
+  <div class="login-card">
+    <div class="login-logo">MAYA FILM</div>
+    <div class="login-field">
+      <label>Kullanıcı Adı</label>
+      <input id="loginUsername" class="login-input" type="text" placeholder="Adınızı girin">
+    </div>
+    <button class="login-btn" onclick="login()">Giriş Yap</button>
+  </div>
+</div>
+
+<!-- ROOM DISCOVERY -->
+<div id="roomDiscovery">
+  <div class="room-header">
+    <h2>Odalar</h2>
+    <button class="room-create-btn" onclick="showCreateRoom()">Yeni Oda</button>
+  </div>
+  <div class="rooms-grid" id="roomsGrid"></div>
+</div>
+
+<!-- CREATE ROOM MODAL -->
+<div class="modal-overlay" id="createRoomModal">
+  <div class="modal-box">
+    <button class="modal-close" onclick="closeCreateRoom()">✕</button>
+    <h3 style="font-family:'Cinzel Decorative';font-size:16px">Yeni Oda Oluştur</h3>
+    <div style="display:flex;flex-direction:column;gap:10px">
+      <div style="display:flex;flex-direction:column;gap:4px">
+        <label style="font-size:10px;color:var(--txt2)">Oda Adı</label>
+        <input id="roomNameInput" class="login-input" type="text" placeholder="Oda adını girin">
+      </div>
+      <div style="display:flex;flex-direction:column;gap:4px">
+        <label style="font-size:10px;color:var(--txt2)">Oda Görseli (URL)</label>
+        <input id="roomImageInput" class="login-input" type="text" placeholder="Görsel URL">
+      </div>
+      <button class="login-btn" onclick="createRoom()">Oda Oluştur</button>
+    </div>
+  </div>
+</div>
+
+<!-- MAIN APP -->
+<div id="app">
+  <!-- HEADER -->
+  <div id="hdr">
+    <div class="hlogo">MAYA</div>
+    <div class="hroom-name" id="hRoomName">Oda</div>
+    <div class="hlive">
+      <div style="width:4px;height:4px;border-radius:50%;background:#e63950;animation:dp 1.2s infinite"></div>
+      <span id="userCount">0</span>
+    </div>
+  </div>
+
+  <!-- MAIN CONTENT -->
+  <div id="main">
+    <!-- VIDEO PANE -->
+    <div id="videoPane">
+      <div id="playerWrap">
+        <div id="placeholder">
+          <div style="font-size:40px">🎬</div>
+          <div>Film başlatılması bekleniyor...</div>
+        </div>
+        <iframe id="videoFrame" style="display:none"></iframe>
+        <video id="videoPlayer" style="display:none"></video>
+      </div>
+      <div id="vidBar">
+        <div id="vidTitle">Bekleniyor...</div>
+      </div>
+      <div id="adminCtrl" style="display:none;padding:8px;gap:8px;flex-wrap:wrap">
+        <input id="vUrl" placeholder="Video URL" style="flex:1;min-width:150px">
+        <button class="vcbtn" onclick="playVideo()">Oynat</button>
+      </div>
+      <div id="seatsArea">
+        <div style="font-size:9px;color:var(--txt2);margin-bottom:6px;font-weight:700">KOLTUKLAR</div>
+        <div id="seatRow"></div>
+      </div>
+    </div>
+
+    <!-- CHAT PANE -->
+    <div id="chatPane">
+      <div id="chatMessages"></div>
+      <div id="chatInput">
+        <div class="chat-field">
+          <textarea id="msgInput" class="msg-input" placeholder="Mesaj yazın..." rows="1"></textarea>
+          <button class="msg-send-btn" onclick="sendMessage()">Gönder</button>
+        </div>
+      </div>
+    </div>
+
+    <!-- SEARCH PANE -->
+    <div id="searchPane">
+      <div class="search-bar">
+        <input id="searchInput" class="search-input" type="text" placeholder="Film ara...">
+        <button class="search-btn" onclick="searchMovies()">Ara</button>
+      </div>
+      <div class="search-results" id="searchResults"></div>
+    </div>
+
+    <!-- PROFILE PANE -->
+    <div id="profilePane">
+      <div class="profile-card">
+        <div class="profile-avatar" id="profileAvatar">👤</div>
+        <div class="profile-name" id="profileName">Kullanıcı</div>
+        <button class="profile-logout" onclick="logout()">Çıkış Yap</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- BOTTOM NAV -->
+<div id="bottomNav">
+  <div class="nav-item active" onclick="showPage('chat')" data-page="chat">
+    <i class="ri-home-4-line"></i>
+    <span>Ev</span>
+  </div>
+  <div class="nav-item" onclick="showPage('profile')" data-page="profile">
+    <i class="ri-user-line"></i>
+    <span>Profil</span>
+  </div>
+</div>
+
+<script>
+const params = new URLSearchParams(location.search);
+let currentPage = params.get('page') || 'rooms';
+let currentRoomId = params.get('room');
+let myUsername = '';
+let myId = '';
+let ws = null;
+let users = {};
+let rooms = {};
+let currentVideo = null;
+
+// ─── LOGIN ───
+function login() {
+  const username = document.getElementById('loginUsername').value.trim();
+  if(!username) return;
+  myUsername = username;
+  localStorage.setItem('username', username);
+  document.getElementById('loginScreen').classList.add('gone');
+  showRooms();
+}
+
+// ─── ROOMS ───
+function showRooms() {
+  currentPage = 'rooms';
+  document.getElementById('roomDiscovery').classList.add('show');
+  document.getElementById('app').classList.remove('show');
+  document.getElementById('bottomNav').style.display = 'none';
+  loadRooms();
+}
+
+function loadRooms() {
+  fetch('/api/rooms').then(r=>r.json()).then(data=>{
+    rooms = data;
+    const grid = document.getElementById('roomsGrid');
+    grid.innerHTML = '';
+    Object.entries(data).forEach(([id, room])=>{
+      const card = document.createElement('div');
+      card.className = 'room-card';
+      card.innerHTML = `
+        <div class="room-image">${room.image ? `<img src="${room.image}">` : room.name.substring(0,2)}</div>
+        <div class="room-info">
+          <div class="room-name">${room.name}</div>
+          <div class="room-meta">
+            <div>ID: ${id.substring(0,8)}</div>
+            <div>👥 ${room.users || 0} kişi</div>
+          </div>
+        </div>
+      `;
+      card.onclick = () => joinRoom(id);
+      grid.appendChild(card);
+    });
+  });
+}
+
+function showCreateRoom() {
+  document.getElementById('createRoomModal').classList.add('open');
+}
+
+function closeCreateRoom() {
+  document.getElementById('createRoomModal').classList.remove('open');
+}
+
+function createRoom() {
+  const name = document.getElementById('roomNameInput').value.trim();
+  const image = document.getElementById('roomImageInput').value.trim();
+  if(!name) return;
+  
+  fetch('/api/rooms', {
+    method: 'POST',
+    headers: {'Content-Type':'application/json'},
+    body: JSON.stringify({name, image})
+  }).then(r=>r.json()).then(data=>{
+    closeCreateRoom();
+    loadRooms();
+  });
+}
+
+function joinRoom(roomId) {
+  currentRoomId = roomId;
+  window.history.pushState({}, '', `?page=chat&room=${roomId}`);
+  showAppWithRoom(roomId);
+}
+
+// ─── APP ───
+function showAppWithRoom(roomId) {
+  document.getElementById('roomDiscovery').classList.remove('show');
+  document.getElementById('app').classList.add('show');
+  document.getElementById('bottomNav').style.display = 'flex';
+  connectToRoom(roomId);
+}
+
+function connectToRoom(roomId) {
+  const protocol = location.protocol === 'https:' ? 'wss:' : 'ws:';
+  ws = new WebSocket(`${protocol}//${location.host}?room=${roomId}&user=${myUsername}`);
+  
+  ws.onopen = () => {
+    console.log('[v0] Connected to room:', roomId);
+  };
+  
+  ws.onmessage = (e) => {
+    const msg = JSON.parse(e.data);
+    handleMessage(msg);
+  };
+  
+  ws.onerror = (err) => console.error('[v0] WS Error:', err);
+  ws.onclose = () => console.log('[v0] Connection closed');
+}
+
+function handleMessage(msg) {
+  switch(msg.type) {
+    case 'init':
+      myId = msg.myId;
+      users = msg.users;
+      updateUI();
+      loadChatHistory(msg.chat);
+      break;
+    case 'users':
+      users = msg.users;
+      updateUI();
+      break;
+    case 'chat':
+      addChatMessage(msg.msg);
+      break;
+    case 'video_change':
+      currentVideo = msg.video;
+      updateVideo();
+      break;
+  }
+}
+
+function updateUI() {
+  // Update header
+  document.getElementById('userCount').textContent = Object.keys(users).length;
+  
+  // Update seats
+  const seatRow = document.getElementById('seatRow');
+  seatRow.innerHTML = '';
+  for(let i = 1; i <= 6; i++) {
+    const seat = document.createElement('div');
+    seat.className = 'seat';
+    const user = Object.values(users).find(u => u.seat === i);
+    if(user) {
+      seat.classList.add('occupied');
+      seat.innerHTML = `
+        <div class="seat-avatar">${user.avatar || user.username.substring(0,1)}</div>
+        <div class="seat-label">${user.username.substring(0,6)}</div>
+      `;
+      seat.style.cursor = 'default';
+    } else {
+      seat.innerHTML = `<div class="seat-label">Koltuk ${i}</div>`;
+      seat.onclick = () => takeSeat(i);
+    }
+    seatRow.appendChild(seat);
+  }
+}
+
+function takeSeat(num) {
+  if(ws && ws.readyState === 1) {
+    ws.send(JSON.stringify({type:'take_seat', seat: num}));
+  }
+}
+
+// ─── CHAT ───
+function loadChatHistory(messages) {
+  const container = document.getElementById('chatMessages');
+  container.innerHTML = '';
+  messages.forEach(m => addChatMessage(m, false));
+}
+
+function addChatMessage(msg, scroll = true) {
+  const container = document.getElementById('chatMessages');
+  const msgEl = document.createElement('div');
+  msgEl.className = 'chat-msg';
+  const initials = msg.username.substring(0,2).toUpperCase();
+  msgEl.innerHTML = `
+    <div class="msg-avatar">${initials}</div>
+    <div class="msg-content">
+      <div class="msg-header">
+        <span>${msg.username}</span>
+        <span class="msg-badge">${msg.tur === 'admin' ? 'Admin' : msg.tur === 'mod' ? 'Mod' : 'Kullanıcı'}</span>
+      </div>
+      <div class="msg-text">${msg.text}</div>
+      <div class="msg-time">${new Date(msg.ts).toLocaleTimeString()}</div>
+    </div>
+  `;
+  container.appendChild(msgEl);
+  if(scroll) container.scrollTop = container.scrollHeight;
+}
+
+function sendMessage() {
+  const input = document.getElementById('msgInput');
+  const text = input.value.trim();
+  if(!text || !ws) return;
+  ws.send(JSON.stringify({type:'chat', text}));
+  input.value = '';
+  input.style.height = 'auto';
+}
+
+// ─── VIDEO ───
+function updateVideo() {
+  if(!currentVideo) return;
+  const wrap = document.getElementById('playerWrap');
+  const frame = document.getElementById('videoFrame');
+  const player = document.getElementById('videoPlayer');
+  const title = document.getElementById('vidTitle');
+  
+  title.textContent = currentVideo.title || 'Video';
+  
+  if(currentVideo.vurl) {
+    if(currentVideo.vtype === 'mp4' || currentVideo.vurl.includes('mp4')) {
+      frame.style.display = 'none';
+      player.style.display = 'block';
+      player.src = currentVideo.vurl;
+      player.play();
+    } else {
+      player.style.display = 'none';
+      frame.style.display = 'block';
+      frame.src = currentVideo.vurl;
+    }
+    document.getElementById('placeholder').style.display = 'none';
+  }
+}
+
+function playVideo() {
+  const url = document.getElementById('vUrl').value.trim();
+  if(!url || !ws) return;
+  ws.send(JSON.stringify({type:'video_change', vtype:'mp4', vurl:url, title:'Oynatılıyor'}));
+  document.getElementById('vUrl').value = '';
+}
+
+// ─── PAGES ───
+function showPage(page) {
+  currentPage = page;
+  
+  // Update nav
+  document.querySelectorAll('.nav-item').forEach(item => {
+    item.classList.remove('active');
+  });
+  document.querySelector(`[data-page="${page}"]`).classList.add('active');
+  
+  // Hide/show panes
+  document.getElementById('chatPane').style.display = page === 'chat' ? 'flex' : 'none';
+  document.getElementById('profilePane').style.display = page === 'profile' ? 'block' : 'none';
+  
+  if(page === 'profile') {
+    document.getElementById('profileName').textContent = myUsername;
+  }
+}
+
+// ─── SEARCH ───
+function searchMovies() {
+  const query = document.getElementById('searchInput').value.trim();
+  if(!query) return;
+  
+  fetch(`/api/search?q=${encodeURIComponent(query)}`)
+    .then(r=>r.json())
+    .then(results=>{
+      const grid = document.getElementById('searchResults');
+      grid.innerHTML = '';
+      results.slice(0, 20).forEach(movie => {
+        const card = document.createElement('div');
+        card.className = 'movie-card';
+        card.innerHTML = `
+          <div class="movie-poster">${movie.poster_url ? `<img src="${movie.poster_url}">` : movie.title.substring(0,2)}</div>
+          <div class="movie-info">
+            <div class="movie-title">${movie.title}</div>
+            <div class="movie-year">${movie.year || 'Bilinmiyor'}</div>
+            <div class="movie-action" onclick="requestMovie(this, '${movie.title}', '${movie.url}')">İste</div>
+          </div>
+        `;
+        grid.appendChild(card);
+      });
+    })
+    .catch(err => console.error('[v0] Search error:', err));
+}
+
+function requestMovie(btn, title, url) {
+  if(!ws) return;
+  ws.send(JSON.stringify({type:'chat', text: `📽️ ${title} (${url})`}));
+  btn.textContent = 'İstenildi!';
+  setTimeout(() => btn.textContent = 'İste', 2000);
+}
+
+// ─── LOGOUT ───
+function logout() {
+  if(ws) ws.close();
+  localStorage.removeItem('username');
+  location.reload();
+}
+
+// ─── INIT ───
+window.onload = () => {
+  myUsername = localStorage.getItem('username');
+  if(!myUsername) {
+    document.getElementById('loader').classList.add('gone');
+    document.getElementById('loginScreen').style.display = 'flex';
+  } else {
+    document.getElementById('loginScreen').classList.add('gone');
+    setTimeout(() => showRooms(), 500);
+  }
+};
+
+// ─── INPUT RESIZE ───
+const msgInput = document.getElementById('msgInput');
+if(msgInput) {
+  msgInput.addEventListener('input', function() {
+    this.style.height = 'auto';
+    this.style.height = Math.min(this.scrollHeight, 60) + 'px';
+  });
+}
+
+@keyframes dp {
+  0%, 100% { opacity: 1; }
+  50% { opacity: 0.2; }
+}
+</script>
+</body>
+</html>
