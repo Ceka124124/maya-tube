@@ -4,6 +4,8 @@ const WS = require('ws');
 const { v4: uuid } = require('uuid');
 const path = require('path');
 const axios = require('axios');
+const multer = require('multer');
+const fs = require('fs');
 
 const app = express();
 const server = http.createServer(app);
@@ -12,29 +14,67 @@ const wss = new WS.Server({ server });
 app.use(express.json());
 app.use(express.static(path.join(__dirname, 'public')));
 
+/* ══ UPLOAD SETUP ══ */
+const UPLOAD_DIR = path.join(__dirname, 'public', 'uploads');
+['chat', 'room', 'user'].forEach(folder => {
+  const p = path.join(UPLOAD_DIR, folder);
+  if (!fs.existsSync(p)) fs.mkdirSync(p, { recursive: true });
+});
+
+const storage = multer.diskStorage({
+  destination: (req, file, cb) => {
+    const folder = req.body?.folder || 'chat';
+    const allowed = ['chat', 'room', 'user'];
+    const dest = path.join(UPLOAD_DIR, allowed.includes(folder) ? folder : 'chat');
+    cb(null, dest);
+  },
+  filename: (req, file, cb) => {
+    const ext = path.extname(file.originalname) || '.jpg';
+    cb(null, uuid() + ext);
+  }
+});
+const upload = multer({
+  storage,
+  limits: { fileSize: 5 * 1024 * 1024 },
+  fileFilter: (req, file, cb) => {
+    if (file.mimetype.startsWith('image/')) cb(null, true);
+    else cb(new Error('Only images allowed'));
+  }
+});
+
 /* ══ STORE ══ */
 const store = { rooms: {} };
 
-function mkRoom(name, image = '') {
+function mkRoom(name, image = '', mode = 'film') {
   const id = 'room-' + Math.floor(Math.random() * 999999 + 1);
   store.rooms[id] = {
     id, name, image,
+    mode: mode || 'film',      // 'film' | 'chat'
+    bg: '',                    // background image url
     created: Date.now(),
     chat: [],
-    video: { type: 'none', vurl: '', title: 'Bekleniyor...', playing: false, currentTime: 0, serverAt: Date.now() },
-    queue: [],        // [{id, title, url, source, poster, addedBy, addedAt}]
-    users: {},        // userId → userObj
-    currentFilm: null // {title, url, source, poster}
+    video: {
+      type: 'none', vurl: '', title: 'Bekleniyor...', playing: false,
+      currentTime: 0, serverAt: Date.now()
+    },
+    queue: [],                 // [{id, title, url, source, poster, addedBy, addedAt}]
+    users: {},                 // userId → userObj
+    currentFilm: null,         // {title, url, source, poster}
+    createdBy: ''              // username of creator (gets admin)
   };
   return id;
 }
 
 // Default room
-mkRoom('Maya Film Odası', '');
+mkRoom('Maya Film Odası', '', 'film');
 
 /* ══ HELPERS ══ */
-function videoNow(v) { return v.playing ? v.currentTime + (Date.now() - v.serverAt) / 1000 : v.currentTime; }
-function videoState(v) { return { ...v, currentTime: videoNow(v), serverAt: Date.now() }; }
+function videoNow(v) {
+  return v.playing ? v.currentTime + (Date.now() - v.serverAt) / 1000 : v.currentTime;
+}
+function videoState(v) {
+  return { ...v, currentTime: videoNow(v), serverAt: Date.now() };
+}
 
 function broadcastToRoom(roomId, data, excludeId = null) {
   const room = store.rooms[roomId];
@@ -47,7 +87,9 @@ function broadcastToRoom(roomId, data, excludeId = null) {
   });
 }
 
-function broadcastAll(roomId, data) { broadcastToRoom(roomId, data, null); }
+function broadcastAll(roomId, data) {
+  broadcastToRoom(roomId, data, null);
+}
 
 function sendToUser(userId, data) {
   const msg = JSON.stringify(data);
@@ -64,7 +106,10 @@ function getUsersArr(roomId) {
 function sysMsg(roomId, text) {
   const msg = { id: uuid(), username: 'sistem', tur: 'system', text, ts: Date.now() };
   const room = store.rooms[roomId];
-  if (room) { room.chat.push(msg); if (room.chat.length > 300) room.chat.shift(); }
+  if (room) {
+    room.chat.push(msg);
+    if (room.chat.length > 300) room.chat.shift();
+  }
   broadcastAll(roomId, { type: 'chat', msg });
 }
 
@@ -86,7 +131,14 @@ function nextInQueue(roomId) {
   sysMsg(roomId, `▶️ Şimdi oynuyor: ${next.title}`);
 }
 
+function isFirstUserInRoom(roomId) {
+  const room = store.rooms[roomId];
+  return room && Object.keys(room.users).length === 0;
+}
+
 /* ══ ROUTES ══ */
+
+// Rooms list
 app.get('/api/rooms', (req, res) => {
   const out = {};
   Object.entries(store.rooms).forEach(([id, r]) => {
@@ -94,6 +146,8 @@ app.get('/api/rooms', (req, res) => {
       id,
       name: r.name,
       image: r.image,
+      mode: r.mode || 'film',
+      bg: r.bg || '',
       users: Object.keys(r.users).length,
       created: r.created,
       currentFilm: r.currentFilm
@@ -102,40 +156,107 @@ app.get('/api/rooms', (req, res) => {
   res.json(out);
 });
 
+// Create room
 app.post('/api/rooms', (req, res) => {
-  const { name, image } = req.body;
+  const { name, image, mode, createdBy } = req.body;
   if (!name) return res.status(400).json({ error: 'Name required' });
-  const id = mkRoom(name, image || '');
+  const id = mkRoom(name, image || '', mode || 'film');
+  store.rooms[id].createdBy = createdBy || '';
   res.json({ id, ...store.rooms[id] });
 });
 
+// Search proxy
 app.get('/api/search', async (req, res) => {
   const q = req.query.q;
   if (!q) return res.json([]);
   try {
-    const r = await axios.get(`https://film.samildev.com/api/search?q=${encodeURIComponent(q)}`, {
-      timeout: 7000, headers: { 'User-Agent': 'Mozilla/5.0' }
-    });
+    const r = await axios.get(
+      `https://film.samildev.com/api/search?q=${encodeURIComponent(q)}`,
+      { timeout: 7000, headers: { 'User-Agent': 'Mozilla/5.0' } }
+    );
     res.json(r.data || []);
-  } catch (e) { res.json([]); }
+  } catch (e) {
+    res.json([]);
+  }
 });
 
+// Links proxy
 app.get('/api/links', async (req, res) => {
   const { url, provider } = req.query;
   if (!url || !provider) return res.json([]);
   try {
-    const r = await axios.get(`https://film.samildev.com/api/links?url=${encodeURIComponent(url)}&provider=${encodeURIComponent(provider)}`, {
-      timeout: 7000, headers: { 'User-Agent': 'Mozilla/5.0' }
-    });
+    const r = await axios.get(
+      `https://film.samildev.com/api/links?url=${encodeURIComponent(url)}&provider=${encodeURIComponent(provider)}`,
+      { timeout: 7000, headers: { 'User-Agent': 'Mozilla/5.0' } }
+    );
     res.json(r.data || []);
-  } catch (e) { res.json([]); }
+  } catch (e) {
+    res.json([]);
+  }
 });
 
-// Queue endpoints
+// Queue
 app.get('/api/rooms/:id/queue', (req, res) => {
   const room = store.rooms[req.params.id];
   if (!room) return res.status(404).json({ error: 'Not found' });
   res.json(room.queue);
+});
+
+// Image upload
+app.post('/api/upload', upload.single('file'), (req, res) => {
+  if (!req.file) return res.status(400).json({ error: 'No file' });
+  const folder = req.body?.folder || 'chat';
+  const relPath = `/uploads/${folder}/${req.file.filename}`;
+  res.json({ url: relPath, path: relPath, file_url: relPath });
+});
+
+// Multer error handler
+app.use((err, req, res, next) => {
+  if (err instanceof multer.MulterError || err?.message === 'Only images allowed') {
+    return res.status(400).json({ error: err.message });
+  }
+  next(err);
+});
+
+/* ══ PROXY ROUTE ══
+   HTML uses: /proxy?url=https://...
+   This forwards the request server-side to avoid CORS issues.
+*/
+app.all('/proxy', async (req, res) => {
+  const target = req.query.url;
+  if (!target) return res.status(400).json({ error: 'url param required' });
+
+  try {
+    const isPost = req.method === 'POST';
+    const headers = { 'User-Agent': 'Mozilla/5.0' };
+
+    // Forward Content-Type for POST requests (but not multipart — multer handles that separately)
+    if (isPost && req.headers['content-type'] && !req.headers['content-type'].includes('multipart')) {
+      headers['Content-Type'] = req.headers['content-type'];
+    }
+
+    const axiosConfig = {
+      method: isPost ? 'post' : 'get',
+      url: target,
+      headers,
+      timeout: 10000,
+      responseType: 'arraybuffer',
+      validateStatus: () => true
+    };
+
+    if (isPost) axiosConfig.data = req.body;
+
+    const r = await axios(axiosConfig);
+
+    // Forward status and content-type
+    res.status(r.status);
+    const ct = r.headers['content-type'];
+    if (ct) res.setHeader('Content-Type', ct);
+    res.setHeader('Access-Control-Allow-Origin', '*');
+    res.send(r.data);
+  } catch (e) {
+    res.status(502).json({ error: 'Proxy error: ' + e.message });
+  }
 });
 
 /* ══ WEBSOCKET ══ */
@@ -143,6 +264,8 @@ wss.on('connection', (ws, req) => {
   const url = new URL(req.url, `http://${req.headers.host}`);
   const roomId = url.searchParams.get('room') || Object.keys(store.rooms)[0];
   const username = (url.searchParams.get('user') || 'Misafir').slice(0, 30);
+  const avatar = (url.searchParams.get('avatar') || '').slice(0, 500);
+  const createdBy = (url.searchParams.get('createdBy') || '').slice(0, 30);
 
   const room = store.rooms[roomId];
   if (!room) { ws.close(1008, 'Room not found'); return; }
@@ -151,11 +274,23 @@ wss.on('connection', (ws, req) => {
   ws.roomId = roomId;
   ws.alive = true;
 
+  // Determine role:
+  // - If username matches room.createdBy → admin
+  // - If room is empty (first to join) → admin
+  // - Otherwise → user
+  let initialRole = 'user';
+  if (room.createdBy && username === room.createdBy) {
+    initialRole = 'admin';
+  } else if (isFirstUserInRoom(roomId)) {
+    initialRole = 'admin';
+    if (!room.createdBy) room.createdBy = username;
+  }
+
   const user = {
     id: ws.userId,
     username,
-    tur: 'user',
-    avatar: '',
+    tur: initialRole,
+    avatar,
     seat: 0,
     muted: false,
     voice: false,
@@ -164,6 +299,7 @@ wss.on('connection', (ws, req) => {
 
   room.users[ws.userId] = user;
 
+  // Send init payload — includes room mode and bg
   ws.send(JSON.stringify({
     type: 'init',
     myId: ws.userId,
@@ -171,7 +307,13 @@ wss.on('connection', (ws, req) => {
     chat: room.chat.slice(-80),
     video: videoState(room.video),
     queue: room.queue,
-    room: { name: room.name, image: room.image, id: roomId }
+    room: {
+      name: room.name,
+      image: room.image,
+      mode: room.mode || 'film',
+      bg: room.bg || '',
+      id: roomId
+    }
   }));
 
   broadcastToRoom(roomId, { type: 'users', users: getUsersArr(roomId) }, ws.userId);
@@ -182,25 +324,37 @@ wss.on('connection', (ws, req) => {
   ws.on('message', async (raw) => {
     let data;
     try { data = JSON.parse(raw); } catch { return; }
+
     const u = room.users[ws.userId];
     if (!u) return;
 
     switch (data.type) {
 
+      /* ─── CHAT ─── */
       case 'chat': {
         if (u.muted) return;
         const text = (data.text || '').slice(0, 500).trim();
         if (!text) return;
-        const msg = { id: uuid(), username: u.username, tur: u.tur, text, ts: Date.now() };
+        const msg = {
+          id: uuid(),
+          username: u.username,
+          tur: u.tur,
+          avatar: u.avatar || '',
+          text,
+          ts: Date.now(),
+          replyTo: data.replyTo || null
+        };
         room.chat.push(msg);
         if (room.chat.length > 300) room.chat.shift();
         broadcastAll(roomId, { type: 'chat', msg });
         break;
       }
 
+      /* ─── TAKE SEAT ─── */
       case 'take_seat': {
         const seatNum = parseInt(data.seat);
-        if (seatNum < 1 || seatNum > 6) return;
+        const maxSeats = room.mode === 'chat' ? 8 : 6;
+        if (seatNum < 1 || seatNum > maxSeats) return;
         const occupied = Object.values(room.users).find(x => x.seat === seatNum && x.id !== ws.userId);
         if (occupied) return;
 
@@ -217,6 +371,7 @@ wss.on('connection', (ws, req) => {
         break;
       }
 
+      /* ─── VOICE JOIN ─── */
       case 'voice_join': {
         if (u.seat === 0) return;
         u.voice = true;
@@ -230,6 +385,7 @@ wss.on('connection', (ws, req) => {
         break;
       }
 
+      /* ─── VOICE LEAVE ─── */
       case 'voice_leave': {
         u.voice = false;
         u.speaking = false;
@@ -238,19 +394,21 @@ wss.on('connection', (ws, req) => {
         break;
       }
 
+      /* ─── SPEAKING ─── */
       case 'speaking': {
         u.speaking = data.active === true;
         broadcastAll(roomId, { type: 'speaking', userId: ws.userId, active: u.speaking });
         break;
       }
 
+      /* ─── WEBRTC SIGNAL ─── */
       case 'webrtc_signal': {
         if (!data.to) return;
         sendToUser(data.to, { type: 'webrtc_signal', from: ws.userId, signal: data.signal });
         break;
       }
 
-      // ─── FILM REQUEST (normal users) ───
+      /* ─── FILM REQUEST (regular users) ─── */
       case 'request_film': {
         if (u.muted) return;
         const req_film = {
@@ -269,14 +427,14 @@ wss.on('connection', (ws, req) => {
         if (!req_film.title || !req_film.url) return;
 
         if (u.tur === 'admin' || u.tur === 'mod') {
-          // Auto approve for mods/admins
+          // Auto-approve for admins/mods
           req_film.approved = true;
           room.queue.push(req_film);
           broadcastAll(roomId, { type: 'queue_update', queue: room.queue });
           sysMsg(roomId, `📋 ${u.username} sıraya ekledi: ${req_film.title}`);
           if (!room.video.vurl && room.queue.length > 0) nextInQueue(roomId);
         } else {
-          // Pending request — broadcast to mods/admins only
+          // Pending request — show to mods/admins
           const requestMsg = {
             id: uuid(),
             username: 'sistem',
@@ -293,11 +451,11 @@ wss.on('connection', (ws, req) => {
         break;
       }
 
-      // ─── MOD APPROVE REQUEST ───
+      /* ─── APPROVE REQUEST (mod/admin) ─── */
       case 'approve_request': {
         if (u.tur !== 'admin' && u.tur !== 'mod') return;
         const item = {
-          id: uuid(),
+          id: data.id || uuid(),
           title: (data.title || '').slice(0, 100),
           url: data.url || '',
           source: data.source || '',
@@ -318,15 +476,19 @@ wss.on('connection', (ws, req) => {
         break;
       }
 
-      // ─── MOD DENY REQUEST ───
+      /* ─── DENY REQUEST (mod/admin) ─── */
       case 'deny_request': {
         if (u.tur !== 'admin' && u.tur !== 'mod') return;
-        broadcastAll(roomId, { type: 'request_denied', requestId: data.requestId, title: data.title });
+        broadcastAll(roomId, {
+          type: 'request_denied',
+          requestId: data.requestId,
+          title: data.title
+        });
         sysMsg(roomId, `❌ ${u.username} reddetti: ${data.title}`);
         break;
       }
 
-      // ─── REMOVE FROM QUEUE ───
+      /* ─── REMOVE FROM QUEUE (mod/admin) ─── */
       case 'remove_queue': {
         if (u.tur !== 'admin' && u.tur !== 'mod') return;
         room.queue = room.queue.filter(q => q.id !== data.id);
@@ -334,21 +496,41 @@ wss.on('connection', (ws, req) => {
         break;
       }
 
-      // ─── SKIP VIDEO ───
+      /* ─── SKIP VIDEO (mod/admin) ─── */
       case 'skip_video': {
         if (u.tur !== 'admin' && u.tur !== 'mod') return;
         sysMsg(roomId, `⏭️ ${u.username} geçti`);
         if (room.queue.length > 0) {
           nextInQueue(roomId);
         } else {
-          room.video = { type: 'none', vurl: '', title: 'Bekleniyor...', playing: false, currentTime: 0, serverAt: Date.now() };
+          room.video = {
+            type: 'none', vurl: '', title: 'Bekleniyor...',
+            playing: false, currentTime: 0, serverAt: Date.now()
+          };
           room.currentFilm = null;
           broadcastAll(roomId, { type: 'video_change', video: room.video, film: null });
         }
         break;
       }
 
-      // ─── DIRECT VIDEO (admin/mod only) ───
+      /* ─── VIDEO ENDED (client reports) ─── */
+      case 'video_ended': {
+        // Only process from mods/admins to avoid duplicate triggers
+        if (u.tur !== 'admin' && u.tur !== 'mod') return;
+        if (room.queue.length > 0) {
+          nextInQueue(roomId);
+        } else {
+          room.video = {
+            type: 'none', vurl: '', title: 'Bekleniyor...',
+            playing: false, currentTime: 0, serverAt: Date.now()
+          };
+          room.currentFilm = null;
+          broadcastAll(roomId, { type: 'video_change', video: room.video, film: null });
+        }
+        break;
+      }
+
+      /* ─── DIRECT VIDEO (admin/mod) ─── */
       case 'video_change': {
         if (u.tur !== 'admin' && u.tur !== 'mod') return;
         room.video = {
@@ -360,21 +542,42 @@ wss.on('connection', (ws, req) => {
           serverAt: Date.now()
         };
         room.currentFilm = { title: data.title, url: data.vurl, source: '', poster: '' };
-        broadcastAll(roomId, { type: 'video_change', video: videoState(room.video), film: room.currentFilm });
+        broadcastAll(roomId, {
+          type: 'video_change',
+          video: videoState(room.video),
+          film: room.currentFilm
+        });
         sysMsg(roomId, `▶️ ${u.username} başlattı: ${room.video.title}`);
         break;
       }
 
+      /* ─── VIDEO SYNC (admin/mod) ─── */
       case 'video_sync': {
         if (u.tur !== 'admin' && u.tur !== 'mod') return;
-        room.video.playing = data.playing !== undefined ? data.playing : room.video.playing;
-        room.video.currentTime = data.currentTime !== undefined ? data.currentTime : videoNow(room.video);
+        if (data.playing !== undefined) room.video.playing = data.playing;
+        if (data.currentTime !== undefined) room.video.currentTime = data.currentTime;
+        else room.video.currentTime = videoNow(room.video);
         room.video.serverAt = Date.now();
         broadcastAll(roomId, { type: 'video_sync', video: videoState(room.video) });
         break;
       }
 
-      // ─── KICK FROM SEAT ───
+      /* ─── ROOM UPDATE (admin/mod) ─── */
+      case 'room_update': {
+        if (u.tur !== 'admin' && u.tur !== 'mod') return;
+        const d = data.data || data; // support both {type,data:{...}} and {type,...fields}
+        if (d.name) room.name = d.name.slice(0, 60);
+        if (d.mode && (d.mode === 'film' || d.mode === 'chat')) room.mode = d.mode;
+        if (d.bg !== undefined) room.bg = d.bg;
+        broadcastAll(roomId, {
+          type: 'room_update',
+          room: { name: room.name, mode: room.mode, bg: room.bg, id: roomId }
+        });
+        sysMsg(roomId, `🏠 ${u.username} otağı yenilədi`);
+        break;
+      }
+
+      /* ─── KICK FROM SEAT (mod/admin) ─── */
       case 'kick_seat': {
         if (u.tur !== 'admin' && u.tur !== 'mod') return;
         const target = room.users[data.userId];
@@ -389,7 +592,7 @@ wss.on('connection', (ws, req) => {
         break;
       }
 
-      // ─── MUTE USER ───
+      /* ─── MUTE USER (mod/admin) ─── */
       case 'mute_user': {
         if (u.tur !== 'admin' && u.tur !== 'mod') return;
         const target = room.users[data.userId];
@@ -397,24 +600,23 @@ wss.on('connection', (ws, req) => {
         target.muted = data.mute !== false;
         sendToUser(data.userId, { type: 'muted', muted: target.muted });
         broadcastAll(roomId, { type: 'users', users: getUsersArr(roomId) });
-        sysMsg(roomId, target.muted ? `🔇 ${target.username} susturuldu` : `🔊 ${target.username} sesi açıldı`);
+        sysMsg(roomId, target.muted
+          ? `🔇 ${target.username} susturuldu`
+          : `🔊 ${target.username} sesi açıldı`
+        );
         break;
       }
 
-      // ─── PROMOTE USER ───
+      /* ─── PROMOTE USER (admin only) ─── */
       case 'promote_user': {
         if (u.tur !== 'admin') return;
         const target = room.users[data.userId];
         if (!target) return;
-        target.tur = data.role || 'mod';
+        const newRole = data.role || 'mod';
+        if (!['admin', 'mod', 'user'].includes(newRole)) return;
+        target.tur = newRole;
         broadcastAll(roomId, { type: 'users', users: getUsersArr(roomId) });
         sysMsg(roomId, `⭐ ${target.username} ${target.tur} oldu`);
-        break;
-      }
-
-      // ─── MAKE ADMIN ───
-      case 'make_admin': {
-        // First user in room gets admin — handled at join for now
         break;
       }
     }
@@ -431,7 +633,7 @@ wss.on('connection', (ws, req) => {
   });
 });
 
-// Ping-pong keep-alive
+/* ══ PING-PONG KEEP-ALIVE ══ */
 setInterval(() => {
   wss.clients.forEach(ws => {
     if (!ws.alive) { ws.terminate(); return; }
@@ -440,13 +642,16 @@ setInterval(() => {
   });
 }, 30000);
 
-// Auto-advance queue when video ends (check every 10s based on timing)
+/* ══ PERIODIC VIDEO SYNC ══
+   Every 15s broadcast current video state to all rooms with active video
+   so late joiners or reconnected clients stay in sync.
+*/
 setInterval(() => {
   Object.values(store.rooms).forEach(room => {
-    if (!room.video.playing || !room.video.vurl) return;
-    // Let clients report video end via 'video_ended' message
+    if (!room.video.vurl) return;
+    broadcastAll(room.id, { type: 'video_sync', video: videoState(room.video) });
   });
-}, 10000);
+}, 15000);
 
 const PORT = process.env.PORT || 3000;
 server.listen(PORT, () => {
