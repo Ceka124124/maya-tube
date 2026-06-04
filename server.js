@@ -1,4 +1,4 @@
-'room-' express = require('express');
+const express = require('express');
 const http = require('http');
 const WS = require('ws');
 const { v4: uuid } = require('uuid');
