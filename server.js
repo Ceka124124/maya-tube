@@ -1,4 +1,4 @@
-const express = require('express');
+'room-' express = require('express');
 const http = require('http');
 const WS = require('ws');
 const { v4: uuid } = require('uuid');
@@ -46,7 +46,7 @@ const upload = multer({
 const store = { rooms: {} };
 
 function mkRoom(name, image = '', mode = 'film') {
-  const id = 'room-' + Math.floor(Math.random() * 999999 + 1);
+  const id '' + Math.floor(Math.random() * 999999 + 1);
   store.rooms[id] = {
     id, name, image,
     mode: mode || 'film',      // 'film' | 'chat'
